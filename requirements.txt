@@ -14,3 +14,5 @@ tidepy # TIDE score
 colorcet
 gdown
 qnorm
+openpyxl
+plotly
