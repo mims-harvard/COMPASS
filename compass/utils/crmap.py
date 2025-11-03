@@ -98,7 +98,6 @@ Notes
   or reducing `TopK_gene` in `personal_crmap_data`.
 """
 
-
 import warnings
 from typing import Tuple, Optional, Dict
 import numpy as np
@@ -108,14 +107,24 @@ from sklearn.metrics import pairwise_distances
 from .sankey import get_projector_weights
 from .loader import loadcompass
 
+
 def prepare_crmap_data(
     dfcx: pd.DataFrame,
     model_path_name: str = "./finetuner_pft_all.pt",
     map_location: str = "cpu",
     z_scale: bool = True,
     concept_palette: Optional[Dict[str, str]] = None,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame,
-           pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> Tuple[
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+]:
     """
     Run COMPASS inference and construct CRMap edge tables.
 
@@ -160,19 +169,19 @@ def prepare_crmap_data(
     # Keep original dfpred for return; internally map to ['NR','R'] for correlation
     dfpred_out = dfpred.copy()
     dfp = dfpred_out.copy()
-    if set(dfp.columns) == {'$P_{NR}$', '$P_{R}$'}:
-        dfp.columns = ['NR', 'R']
-    elif set(dfp.columns) != {'NR', 'R'}:
+    if set(dfp.columns) == {"$P_{NR}$", "$P_{R}$"}:
+        dfp.columns = ["NR", "R"]
+    elif set(dfp.columns) != {"NR", "R"}:
         # minimal fallback: take first two columns as NR/R
         dfp = dfp.iloc[:, :2].copy()
-        dfp.columns = ['NR', 'R']
+        dfp.columns = ["NR", "R"]
 
     dfw = get_projector_weights(model).copy()
-    dfw = dfw[['source', 'target', 'weights', 'group', 'concept']]
+    dfw = dfw[["source", "target", "weights", "group", "concept"]]
 
     # -------- 2) Optional z-scoring (column-wise) --------
     def _z(df: pd.DataFrame) -> pd.DataFrame:
-        scaler = StandardScaler().set_output(transform='pandas')
+        scaler = StandardScaler().set_output(transform="pandas")
         return scaler.fit_transform(df)
 
     if z_scale:
@@ -180,7 +189,7 @@ def prepare_crmap_data(
         dfgn_z = _z(dfgn)
         dfgs_z = _z(dfgs)
         dfct_z = _z(dfct)
-        dfp_z  = _z(dfp)  # only used for celltype→output correlation
+        dfp_z = _z(dfp)  # only used for celltype→output correlation
     else:
         dfcx_z, dfgn_z, dfgs_z, dfct_z, dfp_z = dfcx, dfgn, dfgs, dfct, dfp
 
@@ -195,71 +204,108 @@ def prepare_crmap_data(
     dfgs_ = dfgs_z.loc[common_idx]
     dfgn_ = dfgn_z.loc[common_idx]
     dfcx_ = dfcx_z.loc[common_idx]
-    dfp_  = dfp_z.loc[common_idx]
+    dfp_ = dfp_z.loc[common_idx]
 
     # -------- 4) Build CRMap edge tables --------
     # celltype -> output
-    corr_ct_out = 1 - pairwise_distances(dfct_.T, dfp_.T, metric='correlation')
-    celltype2output = (pd.DataFrame(corr_ct_out, index=dfct_.columns, columns=['NR', 'R'])
-                       .sort_values('R', ascending=False)
-                       .unstack()
-                       .reset_index())
-    celltype2output.columns = ['target', 'source', 'weights']  # target in {'NR','R'}
-    celltype2output['group'] = 'celltype->output'
-    celltype2output['concept'] = celltype2output['source']
-    celltype2output['source_color'] = (
-        celltype2output['source'].map(concept_palette) if concept_palette is not None else '#9e9d93'
+    corr_ct_out = 1 - pairwise_distances(dfct_.T, dfp_.T, metric="correlation")
+    celltype2output = (
+        pd.DataFrame(corr_ct_out, index=dfct_.columns, columns=["NR", "R"])
+        .sort_values("R", ascending=False)
+        .unstack()
+        .reset_index()
     )
-    celltype2output['target_color'] = '#9e9d93'
+    celltype2output.columns = ["target", "source", "weights"]  # target in {'NR','R'}
+    celltype2output["group"] = "celltype->output"
+    celltype2output["concept"] = celltype2output["source"]
+    celltype2output["source_color"] = (
+        celltype2output["source"].map(concept_palette)
+        if concept_palette is not None
+        else "#9e9d93"
+    )
+    celltype2output["target_color"] = "#9e9d93"
 
     # geneset -> celltype
-    geneset2celltype = dfw[dfw.group == 'geneset->celltype'][['source','target','group','concept']].copy()
-    corr_gs_ct = 1 - pairwise_distances(dfgs_.T, dfct_.T, metric='correlation')
-    tmp = (pd.DataFrame(np.abs(corr_gs_ct), index=dfgs_.columns, columns=dfct_.columns)
-             .T.unstack()
-             .loc[geneset2celltype.set_index(['source','target']).index]
-             .reset_index())
-    tmp.columns = ['source', 'target', 'weights']
-    geneset2celltype['weights'] = tmp['weights'].values
+    geneset2celltype = dfw[dfw.group == "geneset->celltype"][
+        ["source", "target", "group", "concept"]
+    ].copy()
+    corr_gs_ct = 1 - pairwise_distances(dfgs_.T, dfct_.T, metric="correlation")
+    tmp = (
+        pd.DataFrame(np.abs(corr_gs_ct), index=dfgs_.columns, columns=dfct_.columns)
+        .T.unstack()
+        .loc[geneset2celltype.set_index(["source", "target"]).index]
+        .reset_index()
+    )
+    tmp.columns = ["source", "target", "weights"]
+    geneset2celltype["weights"] = tmp["weights"].values
 
     # gene -> geneset
-    gene2geneset = dfw[dfw.group == 'gene->geneset'][['source','target','group','concept']].copy()
-    corr_gn_gs = 1 - pairwise_distances(dfgn_.T, dfgs_.T, metric='correlation')
-    tmp = (pd.DataFrame(np.abs(corr_gn_gs), index=dfgn_.columns, columns=dfgs_.columns)
-             .T.unstack()
-             .loc[gene2geneset.set_index(['source','target']).index]
-             .reset_index())
-    tmp.columns = ['source', 'target', 'weights']
-    gene2geneset['weights'] = tmp['weights'].values
+    gene2geneset = dfw[dfw.group == "gene->geneset"][
+        ["source", "target", "group", "concept"]
+    ].copy()
+    corr_gn_gs = 1 - pairwise_distances(dfgn_.T, dfgs_.T, metric="correlation")
+    tmp = (
+        pd.DataFrame(np.abs(corr_gn_gs), index=dfgn_.columns, columns=dfgs_.columns)
+        .T.unstack()
+        .loc[gene2geneset.set_index(["source", "target"]).index]
+        .reset_index()
+    )
+    tmp.columns = ["source", "target", "weights"]
+    gene2geneset["weights"] = tmp["weights"].values
 
     # genetpm -> gene
-    used_genes = [g for g in gene2geneset['source'].unique() if g in dfcx_.columns and g in dfgn_.columns]
+    used_genes = [
+        g
+        for g in gene2geneset["source"].unique()
+        if g in dfcx_.columns and g in dfgn_.columns
+    ]
     if len(used_genes) == 0:
-        raise ValueError("No overlap between genes in dfcx/dfgn and 'gene->geneset' edges.")
+        raise ValueError(
+            "No overlap between genes in dfcx/dfgn and 'gene->geneset' edges."
+        )
     X = dfcx_[used_genes].values  # TPM
     Y = dfgn_[used_genes].values  # gene scores
-    corr_cx_gn = 1 - pairwise_distances(X.T, Y.T, metric='correlation')
+    corr_cx_gn = 1 - pairwise_distances(X.T, Y.T, metric="correlation")
     attn = np.abs(corr_cx_gn)
-    genetpm2gene = (pd.DataFrame(attn, columns=used_genes, index=used_genes)
-                    .unstack()
-                    .reset_index())
-    genetpm2gene.columns = ['source', 'target', 'weights']
-    genetpm2gene['source'] = genetpm2gene['source'] + '@TPM'
-    genetpm2gene['group'] = 'genetpm->gene'
-    genetpm2gene['concept'] = 'Gene'
-    genetpm2gene['source_color'] = '#9e9d93'
-    genetpm2gene['target_color'] = '#9e9d93'
+    genetpm2gene = (
+        pd.DataFrame(attn, columns=used_genes, index=used_genes).unstack().reset_index()
+    )
+    genetpm2gene.columns = ["source", "target", "weights"]
+    genetpm2gene["source"] = genetpm2gene["source"] + "@TPM"
+    genetpm2gene["group"] = "genetpm->gene"
+    genetpm2gene["concept"] = "Gene"
+    genetpm2gene["source_color"] = "#9e9d93"
+    genetpm2gene["target_color"] = "#9e9d93"
 
     # -------- 5) Return in the exact order personal_crmap_data expects --------
     # (celltype2output, geneset2celltype, gene2geneset, genetpm2gene, dfgn, dfgs, dfct, dfpred, dfcx)
-    return (celltype2output, geneset2celltype, gene2geneset, genetpm2gene,
-            dfgn_, dfgs_, dfct_, dfpred_out, dfcx_)
+    return (
+        celltype2output,
+        geneset2celltype,
+        gene2geneset,
+        genetpm2gene,
+        dfgn_,
+        dfgs_,
+        dfct_,
+        dfpred_out,
+        dfcx_,
+    )
 
 
-def personal_crmap_data(patient_id, concept2plot=['NKcell', 'Reference'], TopK_gene=1, 
-                        celltype2output=None, geneset2celltype=None, 
-                        gene2geneset=None, genetpm2gene=None, dfgn=None, 
-                        dfgs=None, dfct=None, dfpred=None, dfcx=None):
+def personal_crmap_data(
+    patient_id,
+    concept2plot=["NKcell", "Reference"],
+    TopK_gene=1,
+    celltype2output=None,
+    geneset2celltype=None,
+    gene2geneset=None,
+    genetpm2gene=None,
+    dfgn=None,
+    dfgs=None,
+    dfct=None,
+    dfpred=None,
+    dfcx=None,
+):
     """
     Build the patient-specific layered edge table used by `draw_personal_crmap`.
 
@@ -334,9 +380,20 @@ def personal_crmap_data(patient_id, concept2plot=['NKcell', 'Reference'], TopK_g
     # ---- original function body of personal_camap_data goes here unchanged ----
     # Simply paste your existing implementation body here.
     # Only the function name & docstring changed.
-    if any(v is None for v in [celltype2output, geneset2celltype, 
-                               gene2geneset, genetpm2gene, dfgn, 
-                               dfgs, dfct, dfpred, dfcx]):
+    if any(
+        v is None
+        for v in [
+            celltype2output,
+            geneset2celltype,
+            gene2geneset,
+            genetpm2gene,
+            dfgn,
+            dfgs,
+            dfct,
+            dfpred,
+            dfcx,
+        ]
+    ):
         raise ValueError("Please provide all required data.")
     try:
         _ = dfcx.loc[patient_id]
@@ -344,31 +401,44 @@ def personal_crmap_data(patient_id, concept2plot=['NKcell', 'Reference'], TopK_g
     except KeyError:
         raise ValueError(f"Patient ID {patient_id} not found in clinical data.")
 
-    dfp1 = celltype2output[celltype2output['source'].isin(concept2plot)].reset_index(drop=True)
-    dfp1['source_value'] = dfp1.source.map(dfct.loc[patient])
+    dfp1 = celltype2output[celltype2output["source"].isin(concept2plot)].reset_index(
+        drop=True
+    )
+    dfp1["source_value"] = dfp1.source.map(dfct.loc[patient])
     pred = dfpred.loc[patient]
-    pred.index = ['NR', 'R']
-    dfp1['target_value'] = dfp1.target.map(pred)
+    pred.index = ["NR", "R"]
+    dfp1["target_value"] = dfp1.target.map(pred)
 
-    dfp2 = geneset2celltype[geneset2celltype.target.isin(concept2plot)].reset_index(drop=True)
-    dfp2['source_value'] = dfp2.source.map(dfgs.loc[patient])
-    dfp2['target_value'] = dfp2.target.map(dfct.loc[patient])
+    dfp2 = geneset2celltype[geneset2celltype.target.isin(concept2plot)].reset_index(
+        drop=True
+    )
+    dfp2["source_value"] = dfp2.source.map(dfgs.loc[patient])
+    dfp2["target_value"] = dfp2.target.map(dfct.loc[patient])
 
     dfp3 = gene2geneset[gene2geneset.target.isin(dfp2.source)]
-    dfp3 = dfp3.groupby('target').apply(lambda x: x.sort_values('weights', ascending=False).iloc[:TopK_gene]).reset_index(drop=True)
-    dfp3['source_value'] = dfp3.source.map(dfgn.loc[patient])
-    dfp3['target_value'] = dfp3.target.map(dfgs.loc[patient])
+    dfp3 = (
+        dfp3.groupby("target")
+        .apply(lambda x: x.sort_values("weights", ascending=False).iloc[:TopK_gene])
+        .reset_index(drop=True)
+    )
+    dfp3["source_value"] = dfp3.source.map(dfgn.loc[patient])
+    dfp3["target_value"] = dfp3.target.map(dfgs.loc[patient])
 
-    dfp4 = genetpm2gene[genetpm2gene.source.apply(lambda x: x.split('@')[0]).isin(dfp3.source.unique())]
+    dfp4 = genetpm2gene[
+        genetpm2gene.source.apply(lambda x: x.split("@")[0]).isin(dfp3.source.unique())
+    ]
     dfp4 = dfp4[dfp4.target.isin(dfp3.source.unique())]
-    dfp4['source_value'] = dfp4.source.apply(lambda x: x.split('@')[0]).map(dfcx.loc[patient])
-    dfp4['target_value'] = dfp4.target.map(dfgn.loc[patient])
+    dfp4["source_value"] = dfp4.source.apply(lambda x: x.split("@")[0]).map(
+        dfcx.loc[patient]
+    )
+    dfp4["target_value"] = dfp4.target.map(dfgn.loc[patient])
 
     data_r = pd.concat([dfp1, dfp2, dfp3, dfp4]).reset_index(drop=True)
     return data_r
 
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -381,28 +451,40 @@ from itertools import chain
 import io
 
 
-
 def draw_personal_crmap(
-                        df,
-                        concept2plot,
-                        figsize=(16, 15),
-                        fontsize=15,
-                        layer_node_sizes=[0.5, 0.5, 1, 3, 5],
-                        max_rad=0.25,
-                        show_geneset_name=False,
-                        layer_node_gaps={'celltype': 0.15, 'geneset': 0.1, 'output': 0.2},
-                        layer_spacing=[1.2, 1, 1, 0.8],
-                        node_label_alignments={'genetpm': -0.01, 'gene': -0.01, 'geneset': 0.01, 'celltype': 0.02, 'output': 0.02},
-                        layer_edge_styles={'celltype->output': {'linestyle': '--', 'arrowstyle': '-'}},
-                        genetpm_node_color_map={'cmap': None, 'vmin': -2, 'vmax': 2},
-                        compass_node_color_map={'cmap': None, 'vmin': 0, 'vmax': 1},
-                        label_threshold={'genetpm': 1, 'gene': 0.5, 'geneset': 0.5, 'celltype': -10, 'output': -10},
-                        label_color_same_as_node=True,
-                        genetpm2gene_edge_colormap={'cmap': None, 'vmin': 0.6, 'vmax': 1.0},
-                        projector_edge_colormap={'cmap': None, 'vmin': 0.0, 'vmax': 0.5},
-                        edge_line_width=[0.2, 0.3, 0.3, 0.5],
-                        genetpm_gene_edge_threshold=0.6,
-                        edge_activate={'threshold': 10, 'color': 'red'}):
+    df,
+    concept2plot,
+    figsize=(16, 15),
+    fontsize=15,
+    layer_node_sizes=[0.5, 0.5, 1, 3, 5],
+    max_rad=0.25,
+    show_geneset_name=False,
+    layer_node_gaps={"celltype": 0.15, "geneset": 0.1, "output": 0.2},
+    layer_spacing=[1.2, 1, 1, 0.8],
+    node_label_alignments={
+        "genetpm": -0.01,
+        "gene": -0.01,
+        "geneset": 0.01,
+        "celltype": 0.02,
+        "output": 0.02,
+    },
+    layer_edge_styles={"celltype->output": {"linestyle": "--", "arrowstyle": "-"}},
+    genetpm_node_color_map={"cmap": None, "vmin": -2, "vmax": 2},
+    compass_node_color_map={"cmap": None, "vmin": 0, "vmax": 1},
+    label_threshold={
+        "genetpm": 1,
+        "gene": 0.5,
+        "geneset": 0.5,
+        "celltype": -10,
+        "output": -10,
+    },
+    label_color_same_as_node=True,
+    genetpm2gene_edge_colormap={"cmap": None, "vmin": 0.6, "vmax": 1.0},
+    projector_edge_colormap={"cmap": None, "vmin": 0.0, "vmax": 0.5},
+    edge_line_width=[0.2, 0.3, 0.3, 0.5],
+    genetpm_gene_edge_threshold=0.6,
+    edge_activate={"threshold": 10, "color": "red"},
+):
     """
     Render a multi-layer, curved-edge Personal COMPASS Response Map (CRMap).
 
@@ -502,81 +584,126 @@ def draw_personal_crmap(
     # ---- original function body of draw_personal_camap goes here unchanged ----
     # Paste your existing implementation body here; only the name/docstring changed.
     fig, ax = plt.subplots(figsize=figsize)
-    ax.axis('off')
+    ax.axis("off")
 
-    layer_links_order = ['genetpm->gene', 'gene->geneset', 'geneset->celltype', 'celltype->output']
-    df['weights_abs'] = df['weights'].abs()
-    layer_node_order_series = df.groupby(['group', 'target']).apply(lambda x: x.sort_values('weights', ascending=True).source.tolist())
+    layer_links_order = [
+        "genetpm->gene",
+        "gene->geneset",
+        "geneset->celltype",
+        "celltype->output",
+    ]
+    df["weights_abs"] = df["weights"].abs()
+    layer_node_order_series = df.groupby(["group", "target"]).apply(
+        lambda x: x.sort_values("weights", ascending=True).source.tolist()
+    )
     layer_node_order = {}
     try:
-        layer_node_order['celltype'] = concept2plot[::-1] #layer_node_order_series.loc[('celltype->output', 'R')]
+        layer_node_order["celltype"] = concept2plot[
+            ::-1
+        ]  # layer_node_order_series.loc[('celltype->output', 'R')]
     except KeyError:
-        layer_node_order['celltype'] = []
+        layer_node_order["celltype"] = []
     try:
-        geneset_order_series = df[df.group == 'geneset->celltype'].groupby('target').apply(lambda x: x.sort_values('weights').source.tolist()).loc[layer_node_order['celltype']]
+        geneset_order_series = (
+            df[df.group == "geneset->celltype"]
+            .groupby("target")
+            .apply(lambda x: x.sort_values("weights").source.tolist())
+            .loc[layer_node_order["celltype"]]
+        )
         geneset_order = list(chain.from_iterable(geneset_order_series))
-        layer_node_order['geneset'] = geneset_order
+        layer_node_order["geneset"] = geneset_order
     except KeyError:
-        layer_node_order['geneset'] = []
-    layer_node_order['output'] = ['NR', 'R']
-    
-    if 'group' not in df.columns:
+        layer_node_order["geneset"] = []
+    layer_node_order["output"] = ["NR", "R"]
+
+    if "group" not in df.columns:
         raise ValueError("DataFrame must contain a 'group' column.")
-    geneset_celltype_mapping = df[df.group == 'geneset->celltype'].set_index('source')['target'].to_dict()
+    geneset_celltype_mapping = (
+        df[df.group == "geneset->celltype"].set_index("source")["target"].to_dict()
+    )
 
-    if genetpm_node_color_map.get('cmap') is None:
-        genetpm_colors = ['blue','white','red']
-        cmap_genetpm = LinearSegmentedColormap.from_list('genetpm_default', genetpm_colors)
+    if genetpm_node_color_map.get("cmap") is None:
+        genetpm_colors = ["blue", "white", "red"]
+        cmap_genetpm = LinearSegmentedColormap.from_list(
+            "genetpm_default", genetpm_colors
+        )
     else:
-        cmap_genetpm = plt.get_cmap(genetpm_node_color_map['cmap'])
-    vmin_genetpm = genetpm_node_color_map.get('vmin', None)
-    vmax_genetpm = genetpm_node_color_map.get('vmax', None)
+        cmap_genetpm = plt.get_cmap(genetpm_node_color_map["cmap"])
+    vmin_genetpm = genetpm_node_color_map.get("vmin", None)
+    vmax_genetpm = genetpm_node_color_map.get("vmax", None)
 
-    if compass_node_color_map.get('cmap') is None:
-        compass_colors = ['white','yellow','orange','red']
-        cmap_compass = LinearSegmentedColormap.from_list('compass_default', compass_colors)
+    if compass_node_color_map.get("cmap") is None:
+        compass_colors = ["white", "yellow", "orange", "red"]
+        cmap_compass = LinearSegmentedColormap.from_list(
+            "compass_default", compass_colors
+        )
     else:
-        cmap_compass = plt.get_cmap(compass_node_color_map['cmap'])
-    vmin_compass = compass_node_color_map.get('vmin', None)
-    vmax_compass = compass_node_color_map.get('vmax', None)
+        cmap_compass = plt.get_cmap(compass_node_color_map["cmap"])
+    vmin_compass = compass_node_color_map.get("vmin", None)
+    vmax_compass = compass_node_color_map.get("vmax", None)
 
-    if genetpm2gene_edge_colormap.get('cmap') is None:
-        g2g_colors = ["#c6dbef", "#9ecae1",  "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b", "#041f47"]
-        g2g_cmap = LinearSegmentedColormap.from_list('genetpm2gene_edge_default', g2g_colors)
+    if genetpm2gene_edge_colormap.get("cmap") is None:
+        g2g_colors = [
+            "#c6dbef",
+            "#9ecae1",
+            "#6baed6",
+            "#4292c6",
+            "#2171b5",
+            "#08519c",
+            "#08306b",
+            "#041f47",
+        ]
+        g2g_cmap = LinearSegmentedColormap.from_list(
+            "genetpm2gene_edge_default", g2g_colors
+        )
     else:
-        g2g_cmap = plt.get_cmap(genetpm2gene_edge_colormap['cmap'])
-    g2g_vmin = genetpm2gene_edge_colormap['vmin']
-    g2g_vmax = genetpm2gene_edge_colormap['vmax']
+        g2g_cmap = plt.get_cmap(genetpm2gene_edge_colormap["cmap"])
+    g2g_vmin = genetpm2gene_edge_colormap["vmin"]
+    g2g_vmax = genetpm2gene_edge_colormap["vmax"]
     g2g_norm = Normalize(vmin=g2g_vmin, vmax=g2g_vmax)
 
-    if projector_edge_colormap.get('cmap') is None:
-        proj_colors = ["#C7E9B4", "#7FCDBB", "#41B6C4", "#1D91C0", "#225EA8", "#253494", "#081D58", "#08306b", "#041F47"]
-        proj_cmap = LinearSegmentedColormap.from_list('projector_edge_default', proj_colors)
+    if projector_edge_colormap.get("cmap") is None:
+        proj_colors = [
+            "#C7E9B4",
+            "#7FCDBB",
+            "#41B6C4",
+            "#1D91C0",
+            "#225EA8",
+            "#253494",
+            "#081D58",
+            "#08306b",
+            "#041F47",
+        ]
+        proj_cmap = LinearSegmentedColormap.from_list(
+            "projector_edge_default", proj_colors
+        )
     else:
-        proj_cmap = plt.get_cmap(projector_edge_colormap['cmap'])
-    proj_vmin = projector_edge_colormap['vmin']
-    proj_vmax = projector_edge_colormap['vmax']
+        proj_cmap = plt.get_cmap(projector_edge_colormap["cmap"])
+    proj_vmin = projector_edge_colormap["vmin"]
+    proj_vmax = projector_edge_colormap["vmax"]
     proj_norm = Normalize(vmin=proj_vmin, vmax=proj_vmax)
 
-    df[['source_layer', 'target_layer']] = df['group'].str.split('->', expand=True)
+    df[["source_layer", "target_layer"]] = df["group"].str.split("->", expand=True)
 
     all_layers = []
     for link in layer_links_order:
-        layers = link.split('->')
+        layers = link.split("->")
         for layer in layers:
             if layer not in all_layers:
                 all_layers.append(layer)
     n_layers = len(all_layers)
 
-    if 'source_value' not in df.columns or 'target_value' not in df.columns:
-        raise ValueError("DataFrame must contain 'source_value' and 'target_value' columns.")
+    if "source_value" not in df.columns or "target_value" not in df.columns:
+        raise ValueError(
+            "DataFrame must contain 'source_value' and 'target_value' columns."
+        )
     node_values = {}
     node_layers = {}
     for idx, rowd in df.iterrows():
-        node_values[rowd['source']] = rowd['source_value']
-        node_values[rowd['target']] = rowd['target_value']
-        node_layers[rowd['source']] = rowd['source_layer']
-        node_layers[rowd['target']] = rowd['target_layer']
+        node_values[rowd["source"]] = rowd["source_value"]
+        node_values[rowd["target"]] = rowd["target_value"]
+        node_layers[rowd["source"]] = rowd["source_layer"]
+        node_layers[rowd["target"]] = rowd["target_layer"]
 
     layer_nodes_dict = {}
     for node, layer in node_layers.items():
@@ -591,10 +718,10 @@ def draw_personal_crmap(
             unordered_nodes = [node for node in nodes if node not in ordered_nodes]
             layer_nodes = ordered_nodes + unordered_nodes
         else:
-            if layer == 'geneset' and geneset_celltype_mapping:
+            if layer == "geneset" and geneset_celltype_mapping:
                 geneset_groups = {}
                 for node in nodes:
-                    celltype = geneset_celltype_mapping.get(node, 'Unknown')
+                    celltype = geneset_celltype_mapping.get(node, "Unknown")
                     geneset_groups.setdefault(celltype, []).append(node)
                 layer_nodes = []
                 for celltype in sorted(geneset_groups.keys()):
@@ -604,7 +731,7 @@ def draw_personal_crmap(
                 layer_nodes = sorted(nodes, reverse=True)
         layer_nodes_dict[layer] = layer_nodes
 
-    genetpm_layer = 'genetpm'
+    genetpm_layer = "genetpm"
     genetpm_nodes = layer_nodes_dict.get(genetpm_layer, [])
     compass_nodes = []
     for layer in all_layers:
@@ -628,8 +755,8 @@ def draw_personal_crmap(
 
     # Use layer_spacing to determine layer positions
     if len(layer_spacing) < n_layers - 1:
-        layer_spacing = list(layer_spacing) + [1]*(n_layers - 1 - len(layer_spacing))
-    layer_spacing = layer_spacing[:n_layers-1]
+        layer_spacing = list(layer_spacing) + [1] * (n_layers - 1 - len(layer_spacing))
+    layer_spacing = layer_spacing[: n_layers - 1]
 
     x_positions = [0]
     for sp in layer_spacing:
@@ -637,7 +764,7 @@ def draw_personal_crmap(
     max_pos = x_positions[-1] if x_positions else 1
     if max_pos == 0:
         max_pos = 1
-    x_positions = [x/max_pos for x in x_positions]
+    x_positions = [x / max_pos for x in x_positions]
 
     layer_positions = {layer: x_positions[idx] for idx, layer in enumerate(all_layers)}
 
@@ -651,20 +778,20 @@ def draw_personal_crmap(
         if n_nodes > 1:
             if layer_name in layer_node_gaps:
                 gap_y = layer_node_gaps[layer_name]
-                total_height = gap_y*(n_nodes-1)
-                if total_height>1:
-                    gap_y=1.0/(n_nodes-1)
-                y_start = 0.5 - (gap_y*(n_nodes-1)/2)
-                y_positions = [y_start + i*gap_y for i in range(n_nodes)]
+                total_height = gap_y * (n_nodes - 1)
+                if total_height > 1:
+                    gap_y = 1.0 / (n_nodes - 1)
+                y_start = 0.5 - (gap_y * (n_nodes - 1) / 2)
+                y_positions = [y_start + i * gap_y for i in range(n_nodes)]
             else:
-                y_positions = np.linspace(0,1,n_nodes)
+                y_positions = np.linspace(0, 1, n_nodes)
         else:
-            y_positions=[0.5]
+            y_positions = [0.5]
 
-        y_positions = [min(max(y,0),1) for y in y_positions]
-        positions = list(zip([x_position]*n_nodes, y_positions))
+        y_positions = [min(max(y, 0), 1) for y in y_positions]
+        positions = list(zip([x_position] * n_nodes, y_positions))
 
-        if layer_name=='genetpm':
+        if layer_name == "genetpm":
             c_map = cmap_genetpm
             c_norm = norm_genetpm
         else:
@@ -674,146 +801,205 @@ def draw_personal_crmap(
         x_positions_plot = [pos[0] for pos in positions]
         y_positions_plot = [pos[1] for pos in positions]
         node_colors = [c_map(c_norm(node_values[n])) for n in nodes]
-        #node_colors = [mcolors.to_hex(c_map(c_norm(node_values[n]))) for n in nodes]
-        
-        ax.scatter(x_positions_plot, y_positions_plot, s=node_size, zorder=3, linewidths = 0.5,
-                   edgecolors='k', facecolors=node_colors)
-        for n,(xx,yy) in zip(nodes, positions):
-            node_positions[n]=(xx,yy)
+        # node_colors = [mcolors.to_hex(c_map(c_norm(node_values[n]))) for n in nodes]
+
+        ax.scatter(
+            x_positions_plot,
+            y_positions_plot,
+            s=node_size,
+            zorder=3,
+            linewidths=0.5,
+            edgecolors="k",
+            facecolors=node_colors,
+        )
+        for n, (xx, yy) in zip(nodes, positions):
+            node_positions[n] = (xx, yy)
 
         if label_threshold and layer_name in label_threshold:
             threshold = label_threshold[layer_name]
             offset = node_label_alignments.get(layer_name, -0.02)
             i = 0
-            for n,(xx,yy) in zip(nodes, positions):
-                if layer_name == 'geneset' and not show_geneset_name:
+            for n, (xx, yy) in zip(nodes, positions):
+                if layer_name == "geneset" and not show_geneset_name:
                     continue
 
-                if layer_name == 'genetpm':
+                if layer_name == "genetpm":
                     node_value = abs(node_values[n])
                 else:
                     node_value = node_values[n]
-                    
-                if node_value>threshold:
-                    if offset<0:
-                        text_x=xx+offset
-                        ha='right'
-                    elif offset>0:
-                        text_x=xx+offset
-                        ha='left'
-                    else:
-                        text_x=xx
-                        ha='center'
-                    label_text=str(n).replace('@TPM','')
 
-                    if layer_name == 'output':
-                        label_text = "$P_{%s} = %s$" % (label_text, round(node_value,2))
-                        
-                    if label_color_same_as_node and (layer_name == 'genetpm'): # or layer_name == 'gene'
-                        ax.text(text_x, yy, label_text, fontsize=fontsize, ha=ha, va='center', color = node_colors[i]) 
+                if node_value > threshold:
+                    if offset < 0:
+                        text_x = xx + offset
+                        ha = "right"
+                    elif offset > 0:
+                        text_x = xx + offset
+                        ha = "left"
                     else:
-                        ax.text(text_x, yy, label_text, fontsize=fontsize, ha=ha, va='center')
+                        text_x = xx
+                        ha = "center"
+                    label_text = str(n).replace("@TPM", "")
+
+                    if layer_name == "output":
+                        label_text = "$P_{%s} = %s$" % (
+                            label_text,
+                            round(node_value, 2),
+                        )
+
+                    if label_color_same_as_node and (
+                        layer_name == "genetpm"
+                    ):  # or layer_name == 'gene'
+                        ax.text(
+                            text_x,
+                            yy,
+                            label_text,
+                            fontsize=fontsize,
+                            ha=ha,
+                            va="center",
+                            color=node_colors[i],
+                        )
+                    else:
+                        ax.text(
+                            text_x,
+                            yy,
+                            label_text,
+                            fontsize=fontsize,
+                            ha=ha,
+                            va="center",
+                        )
                 i += 1
 
+        layer_name_map = {
+            "genetpm": "INPUT" + "\n$X_{GeneTPM}$",
+            "gene": "Gene" + "\nscore: $S_{Gene}$",
+            "geneset": "Granular concept" + "\nscore: $S_{Geneset}$",
+            "celltype": "High-level concept" + "\nscore: $S_{Concept}$",
+            "output": "OUTPUT" + "\n$P_{(R|NR)}$",
+        }
 
-        layer_name_map = {'genetpm':'INPUT' + '\n$X_{GeneTPM}$',
-                          'gene':'Gene' + '\nscore: $S_{Gene}$',  
-                          'geneset':'Granular concept' +'\nscore: $S_{Geneset}$',  
-                          'celltype':'High-level concept'+'\nscore: $S_{Concept}$', 
-                          'output':'OUTPUT' + '\n$P_{(R|NR)}$'}
-        
-        if layer_name != 'output':
-            ax.text(x_position,1.07,layer_name_map.get(layer_name),fontsize=fontsize+2, ha='center', va='center')
+        if layer_name != "output":
+            ax.text(
+                x_position,
+                1.07,
+                layer_name_map.get(layer_name),
+                fontsize=fontsize + 2,
+                ha="center",
+                va="center",
+            )
         else:
-            ax.text(x_position,0.5,layer_name_map.get(layer_name),fontsize=fontsize+2, ha='center', va='center')
-            
+            ax.text(
+                x_position,
+                0.5,
+                layer_name_map.get(layer_name),
+                fontsize=fontsize + 2,
+                ha="center",
+                va="center",
+            )
+
     for idx, rowd in df.iterrows():
-        source = rowd['source']
-        target = rowd['target']
-        weight = rowd['weights']
-        source_layer = rowd['source_layer']
-        target_layer = rowd['target_layer']
+        source = rowd["source"]
+        target = rowd["target"]
+        weight = rowd["weights"]
+        source_layer = rowd["source_layer"]
+        target_layer = rowd["target_layer"]
         layer_connection = f"{source_layer}->{target_layer}"
 
         # threshold pruning for genetpm->gene
-        if layer_connection=='genetpm->gene' and abs(weight)<genetpm_gene_edge_threshold and (str(source).replace('@TPM','') != target):
+        if (
+            layer_connection == "genetpm->gene"
+            and abs(weight) < genetpm_gene_edge_threshold
+            and (str(source).replace("@TPM", "") != target)
+        ):
             continue
 
-        if layer_connection=='genetpm->gene':
-            edge_norm_value=g2g_norm(weight)
-            current_edge_color=g2g_cmap(edge_norm_value)
-            lw=edge_line_width[layer_links_order.index(layer_connection)]
+        if layer_connection == "genetpm->gene":
+            edge_norm_value = g2g_norm(weight)
+            current_edge_color = g2g_cmap(edge_norm_value)
+            lw = edge_line_width[layer_links_order.index(layer_connection)]
         else:
-            edge_norm_value=proj_norm(weight)
-            current_edge_color=proj_cmap(edge_norm_value)
-            lw=edge_line_width[layer_links_order.index(layer_connection)]
+            edge_norm_value = proj_norm(weight)
+            current_edge_color = proj_cmap(edge_norm_value)
+            lw = edge_line_width[layer_links_order.index(layer_connection)]
 
         if edge_activate:
-            threshold = edge_activate.get('threshold',None)
-            override_color = edge_activate.get('color',None)
+            threshold = edge_activate.get("threshold", None)
+            override_color = edge_activate.get("color", None)
             if threshold is not None and override_color is not None:
-                if weight>threshold:
-                    current_edge_color=override_color
+                if weight > threshold:
+                    current_edge_color = override_color
 
-        (x_a,y_a)=node_positions[source]
-        (x_b,y_b)=node_positions[target]
-        delta_y=y_b-y_a
-        rad=max_rad*delta_y
-        rad=max(-max_rad,min(max_rad,rad))
+        (x_a, y_a) = node_positions[source]
+        (x_b, y_b) = node_positions[target]
+        delta_y = y_b - y_a
+        rad = max_rad * delta_y
+        rad = max(-max_rad, min(max_rad, rad))
 
-        edge_style = layer_edge_styles.get(layer_connection,{'linestyle':'-','arrowstyle':'-'})
-        line_style = edge_style.get('linestyle','-')
-        arrow_style = edge_style.get('arrowstyle','-')
+        edge_style = layer_edge_styles.get(
+            layer_connection, {"linestyle": "-", "arrowstyle": "-"}
+        )
+        line_style = edge_style.get("linestyle", "-")
+        arrow_style = edge_style.get("arrowstyle", "-")
 
-        con=FancyArrowPatch((x_a,y_a),(x_b,y_b),
-                            arrowstyle=arrow_style,
-                            linestyle=line_style,
-                            connectionstyle=f"arc3,rad={rad}",
-                            color=current_edge_color,linewidth=lw,
-                            mutation_scale=10)
+        con = FancyArrowPatch(
+            (x_a, y_a),
+            (x_b, y_b),
+            arrowstyle=arrow_style,
+            linestyle=line_style,
+            connectionstyle=f"arc3,rad={rad}",
+            color=current_edge_color,
+            linewidth=lw,
+            mutation_scale=10,
+        )
         ax.add_patch(con)
 
     fig.subplots_adjust(right=0.88)
 
-    sm_genetpm=ScalarMappable(cmap=cmap_genetpm,norm=norm_genetpm)
+    sm_genetpm = ScalarMappable(cmap=cmap_genetpm, norm=norm_genetpm)
     sm_genetpm.set_array([])
-    cax_genetpm=fig.add_axes([0.94, 0.74, 0.015, 0.1])  
-    cbar_genetpm=plt.colorbar(sm_genetpm,cax=cax_genetpm,orientation='vertical')
-    cbar_genetpm.set_label('Gene TPM\nZ-score',rotation=90,labelpad=5,fontsize=fontsize)
+    cax_genetpm = fig.add_axes([0.94, 0.74, 0.015, 0.1])
+    cbar_genetpm = plt.colorbar(sm_genetpm, cax=cax_genetpm, orientation="vertical")
+    cbar_genetpm.set_label(
+        "Gene TPM\nZ-score", rotation=90, labelpad=5, fontsize=fontsize
+    )
     cbar_genetpm.ax.tick_params(labelsize=fontsize)
-    cbar_genetpm.set_ticks([vmin_genetpm,vmax_genetpm])
-    cbar_genetpm.set_ticklabels([f"{vmin_genetpm:.1f}",f"{vmax_genetpm:.1f}"])
+    cbar_genetpm.set_ticks([vmin_genetpm, vmax_genetpm])
+    cbar_genetpm.set_ticklabels([f"{vmin_genetpm:.1f}", f"{vmax_genetpm:.1f}"])
 
-    sm_compass=ScalarMappable(cmap=cmap_compass,norm=norm_compass)
+    sm_compass = ScalarMappable(cmap=cmap_compass, norm=norm_compass)
     sm_compass.set_array([])
-    cax_compass=fig.add_axes([0.94, 0.56, 0.015, 0.1])  
-    cbar_compass=plt.colorbar(sm_compass,cax=cax_compass,orientation='vertical')
-    cbar_compass.set_label('COMPASS score\nZ-score',rotation=90,labelpad=5,fontsize=fontsize)
+    cax_compass = fig.add_axes([0.94, 0.56, 0.015, 0.1])
+    cbar_compass = plt.colorbar(sm_compass, cax=cax_compass, orientation="vertical")
+    cbar_compass.set_label(
+        "COMPASS score\nZ-score", rotation=90, labelpad=5, fontsize=fontsize
+    )
     cbar_compass.ax.tick_params(labelsize=fontsize)
-    cbar_compass.set_ticks([vmin_compass,vmax_compass])
-    cbar_compass.set_ticklabels([f"{vmin_compass:.1f}",f"{vmax_compass:.1f}"])
+    cbar_compass.set_ticks([vmin_compass, vmax_compass])
+    cbar_compass.set_ticklabels([f"{vmin_compass:.1f}", f"{vmax_compass:.1f}"])
 
-    sm_g2g=ScalarMappable(cmap=g2g_cmap,norm=g2g_norm)
+    sm_g2g = ScalarMappable(cmap=g2g_cmap, norm=g2g_norm)
     sm_g2g.set_array([])
-    cax_g2g=fig.add_axes([0.94, 0.37, 0.015, 0.1])
-    cbar_g2g=plt.colorbar(sm_g2g,cax=cax_g2g,orientation='vertical')
-    cbar_g2g.set_label('Encoder\nedge weights',rotation=90,labelpad=5,fontsize=fontsize)
+    cax_g2g = fig.add_axes([0.94, 0.37, 0.015, 0.1])
+    cbar_g2g = plt.colorbar(sm_g2g, cax=cax_g2g, orientation="vertical")
+    cbar_g2g.set_label(
+        "Encoder\nedge weights", rotation=90, labelpad=5, fontsize=fontsize
+    )
     cbar_g2g.ax.tick_params(labelsize=fontsize)
-    cbar_g2g.set_ticks([g2g_vmin,g2g_vmax])
-    cbar_g2g.set_ticklabels([f"{g2g_vmin:.1f}",f"{g2g_vmax:.1f}"])
+    cbar_g2g.set_ticks([g2g_vmin, g2g_vmax])
+    cbar_g2g.set_ticklabels([f"{g2g_vmin:.1f}", f"{g2g_vmax:.1f}"])
 
-    sm_proj=ScalarMappable(cmap=proj_cmap,norm=proj_norm)
+    sm_proj = ScalarMappable(cmap=proj_cmap, norm=proj_norm)
     sm_proj.set_array([])
-    cax_proj=fig.add_axes([0.94, 0.19, 0.015, 0.1])
-    cbar_proj=plt.colorbar(sm_proj,cax=cax_proj,orientation='vertical')
-    cbar_proj.set_label('Projector\nedge weights',rotation=90,labelpad=5,fontsize=fontsize)
+    cax_proj = fig.add_axes([0.94, 0.19, 0.015, 0.1])
+    cbar_proj = plt.colorbar(sm_proj, cax=cax_proj, orientation="vertical")
+    cbar_proj.set_label(
+        "Projector\nedge weights", rotation=90, labelpad=5, fontsize=fontsize
+    )
     cbar_proj.ax.tick_params(labelsize=fontsize)
-    cbar_proj.set_ticks([proj_vmin,proj_vmax])
-    cbar_proj.set_ticklabels([f"{proj_vmin:.1f}",f"{proj_vmax:.1f}"])
+    cbar_proj.set_ticks([proj_vmin, proj_vmax])
+    cbar_proj.set_ticklabels([f"{proj_vmin:.1f}", f"{proj_vmax:.1f}"])
 
     plt.close(fig)
     return fig
-
 
 
 if __name__ == "__main__":
