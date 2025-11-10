@@ -1,0 +1,14 @@
+# ---------------------------
+# Jupyter / IPython cache
+# ---------------------------
+.ipynb_checkpoints/
+.ipython/
+.local/
+.profile_default/
+*.nbconvert.ipynb
+*.nbconvert/
+
+## ignore data files
+TCGA
+ITRP
+*.TABLE
