@@ -22,7 +22,7 @@ An `example2run.ipynb` under the example folder is provided to run below experim
 ```bash
 conda create -n compass python=3.8
 conda activate compass
-pip install immuno-compass
+pip install immuno-compass -U
 ```
 
 > **⚡ GPU (CUDA) Support:**
