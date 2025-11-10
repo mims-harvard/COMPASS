@@ -34,10 +34,9 @@ from compass.augmentor import (
 )
 from compass.model.scaler import Datascaler
 from compass.model.model import Compass
-from compass.model.model import Compass as Conceptor
-
 from compass.model.train import PT_Trainer, PT_Tester
 from compass.model.adapt import Adp_Trainer, Adp_Tester
+from compass.model.adapt import _remap_distilled_encoder
 
 from compass.model.tune import (
     FT_Trainer,
@@ -55,7 +54,6 @@ from compass.utils import (
     plot_embed_with_label,
     loadcompass,
 )  #  code for compass model loading
-
 
 def fixseed(seed=42):
     np.random.seed(seed)
@@ -187,15 +185,20 @@ class PreTrainer:
         )
 
         model = model.to(self.device)
-
+        self.model = model
+        
         ssl_loss = TripletLoss(margin=self.triplet_margin, metric=self.triplet_metric)
-
         ce_loss = CEWithNaNLabelsLoss(weights=self.task_class_weight)
         mae_loss = MAEWithNaNLabelsLoss()
 
-        optimizer = torch.optim.Adam(
-            model.parameters(), lr=self.lr, weight_decay=self.weight_decay
-        )
+        _remap_distilled_encoder(self) # knowledge-distilled from the FlashAttention-based weights
+        plist = [
+                {"params": model.inputencoder.parameters(), 'lr': 1e-8},
+                {"params": model.latentprojector.parameters()},  
+                {"params": model.taskdecoder.parameters()},  
+                ]
+
+        optimizer = torch.optim.Adam(plist, lr=self.lr, weight_decay=self.weight_decay)
         saver = SaveBestModel(save_dir=save_dir, save_name="model.pth")
 
         if task_type == "c":
@@ -205,7 +208,6 @@ class PreTrainer:
         else:
             raise ValueError("Invalid task_type. Use 'c', or 'r'. ")
 
-        self.model = model
         self.ssl_loss = ssl_loss
         self.tsk_loss = tsk_loss
         self.optimizer = optimizer

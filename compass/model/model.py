@@ -26,6 +26,7 @@ def fixseed(seed=42):
     torch.backends.cudnn.benchmark = False
 
 
+
 class Compass(nn.Module):
 
     def __init__(

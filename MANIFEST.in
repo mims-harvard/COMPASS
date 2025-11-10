@@ -12,6 +12,4 @@ global-exclude *.pyc
 
 #package data
 include compass/tokenizer/*
-include paper/checkpoint/latest/pretrainer.pt
-include paper/checkpoint/latest/finetuner_pft_all.pt
-include paper/checkpoint/latest/finetuner_lft_all.pt
+include compass/model/*
