@@ -2,7 +2,7 @@
 
 <!-- [![Documentation Status](https://readthedocs.org/projects/immuno-compass/badge/?version=latest&style=flat-square)](https://immuno-compass.readthedocs.io/en/latest/) -->
 [![PyPI version](https://badge.fury.io/py/immuno-compass.svg)](https://badge.fury.io/py/immuno-compass)
-[![Downloads](https://static.pepy.tech/badge/immuno-compass)](https://pepy.tech/project/immuno-compass)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/immuno-compass?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/immuno-compass)
 ---
 [![COMPASS Paper](https://img.shields.io/badge/Paper-COMPASS-yellow)](https://www.medrxiv.org/content/10.1101/2025.05.01.25326820v1)
 [![ProjectPage](https://img.shields.io/badge/ProjectPage-COMPASS-red)](https://www.immuno-compass.com/)
