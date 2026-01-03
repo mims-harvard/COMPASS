@@ -1,5 +1,5 @@
 # COMPASS Reproducibility (Pretraining from Scratch & Downstream Fine-Tuning)
-[![Repro version](https://img.shields.io/badge/Repro%20version-2.0.1-green)](https://pypi.org/project/immuno-compass/2.0/)
+[![Repro version](https://img.shields.io/badge/Repro%20version-2.0.1-green)](https://pypi.org/project/immuno-compass/2.0.1/)
 
 
 
