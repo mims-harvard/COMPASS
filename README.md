@@ -1,10 +1,7 @@
 # COMPASS Reproducibility (Pretraining from Scratch & Downstream Fine-Tuning)
 [![Repro version](https://img.shields.io/badge/Repro%20version-2.0.1-green)](https://pypi.org/project/immuno-compass/2.0.1/)
 
-
-
-
-This branch provides a **fully reproducible pipeline** for the COMPASS model, including **pretraining from scratch** and **fine-tuning on downstream immunotherapy response datasets**.
+This branch provides a **fully reproducible pipeline** for the COMPASS model, including **pretraining from scratch** and **fine-tuning on downstream immunotherapy response datasets**. 
 
 ---
 
@@ -79,15 +76,15 @@ pip install immuno-compass==2.0.1
 
 ## ⚙️ Step 3: Run Pretraining from Scratch
 
-Open and execute the following notebook:
+Go to the `run_scripts` folder, Open and execute the following notebook:
 
 ```text
 01_pretraining.ipynb
 ```
 
 > **Note**
-> The example notebook uses the **TCGA-1065** gene subset for faster execution and reduced GPU memory usage.
-> Pretraining with the full **15,672-gene** input requires high-memory GPUs.
+> The example notebook uses the **TCGA-2475** gene subset for faster execution and reduced GPU memory usage.
+
 
 ---
 
@@ -95,15 +92,15 @@ Open and execute the following notebook:
 
 You can either run the notebooks interactively or execute them sequentially via scripts.
 
-Below is an example using `nbconvert` (tested on **V100S GPU**):
+Below is an example using `nbconvert` (tested on **V100 GPU**):
 
 ```bash
 jupyter nbconvert --to notebook --execute 01_loco_nft.ipynb --output 01_loco_nft.ipynb
 jupyter nbconvert --to notebook --execute 02_loco_lft.ipynb --output 02_loco_lft.ipynb
 jupyter nbconvert --to notebook --execute 03_loco_pft.ipynb --output 03_loco_pft.ipynb
 jupyter nbconvert --to notebook --execute 04_loco_fft.ipynb --output 04_loco_fft.ipynb
-jupyter nbconvert --to notebook --execute 05_analysis_loco.ipynb --output 05_analysis_loco.ipynb
-jupyter nbconvert --to notebook --execute 06_loco_lgr.ipynb --output 06_loco_lgr.ipynb
+jupyter nbconvert --to notebook --execute 05_loco_lgr.ipynb --output 05_loco_lgr.ipynb
+jupyter nbconvert --to notebook --execute 06_analysis_loco.ipynb --output 06_analysis_loco.ipynb
 ```
 
 ---

@@ -159,7 +159,6 @@ class ProtoNetNFTDecoder:
             "R": 1,
             "NR": 0,
         }
-
         self.temperature = temperature
 
         
