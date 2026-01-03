@@ -6,8 +6,13 @@ scikit-learn
 umap-learn 
 wandb
 matplotlib
-seaborn==0.12.0
+seaborn #==0.12.0
 statannotations==0.6.0
 comut
 gseapy ##ssGSEA
 tidepy # TIDE score
+colorcet
+gdown
+qnorm
+openpyxl
+plotly

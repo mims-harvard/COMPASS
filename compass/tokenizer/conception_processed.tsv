@@ -1,0 +1,133 @@
+GeneSet	BroadCelltypePathway	Lineage	GeneSet_index	Concept_index	Description	Genes	Reference	n_genes
+Bcell_l_Danaher17	Bcell_general	Lymphoid_lineage_Bcell	0	0	B cell; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	BLK:CD19:MS4A1:TNFRSF17:FCRL2:PNOC:SPIB:TCL1A	PMID: 28239471	8
+Bcell_sc	Bcell_general	Lymphoid_lineage_Bcell	1	0	B cell; data-derived v9	CD19:MS4A1:TNFRSF13C:VPREB3:PAX5:CR2	PMID: 34761219	6
+MemBcell_sc	Memory_Bcell	Lymphoid_lineage_Bcell	2	1	Memory B cell; data-derived v8	TNFRSF13B:AIM2:CLECL1	PMID: 34761219	3
+NaiBcell_sc	Naive_Bcell	Lymphoid_lineage_Bcell	3	2	Naive B cell; data-derived v8	CD72:TCL1A:FCER2:BTLA:FCRL1	PMID: 34761219	5
+Plasma_sc	Plasma_cell	Lymphoid_lineage_Bcell	4	3	Plasma cell; data-derived v9	JSRP1:DERL3:FCRL2:FCRL5:IGLL5:TNFRSF17	PMID: 34761219	6
+CD4Tcell_Combes22	CD4_Tcell	Lymphoid_lineage_T/NKcell	5	4	CD4-positive T cell; derived from FACS-sorted tumor bulk RNAseq; Combes et al. Cell 2022	BACH2:TRABD2A:IL7R:HDAC4:NR3C2:ADD3:PABPC1:PABPC3:MFHAS1:DSC1:SELL:SESN1	PMID: 34963056	12
+CD4Tcell_IL2_I_Kaptein2022	CD4_Tcell	Lymphoid_lineage_T/NKcell	6	4	Genes characteristic for CD4 T cell / IL-2; low expression associated with resistance to neoadjuvant CTLA4+PD1 blockade; Kaptein et al. Sci Trans Med 2022	IL2:CD4:ICOS:EOMES:IL21R:IL2RA:IL2RB:IL2RG:CD40LG:CD48	PMID: 35476594	10
+CD4Tcell_sc	CD4_Tcell	Lymphoid_lineage_T/NKcell	7	4	CD4-positive, alpha-beta T cell; data-derived v9	CD4:TRAT1:CD40LG:LEF1:TNFRSF4	PMID: 34761219	5
+Th17CD4Tcell_sc	CD4_Tcell	Lymphoid_lineage_T/NKcell	8	4	T-helper 17 cell; data-derived v9	IL17A:IL17RE:RORC:IL23R	PMID: 34761219	4
+CD8Tcell_sc	CD8_Tcell	Lymphoid_lineage_T/NKcell	9	5	CD8Tcell_sc (Average expression of CD8A + CD8B)	CD8A:CD8B	PMID: 27301722;PMID: 30127393; PMID: 34761219	2
+BadCD8Tcell_l_SadeFeldman18	CD8_Tcell	Lymphoid_lineage_T/NKcell	10	5	TIL CD8-positive T cells associated with resistance to CIT, termed bad T cells; signature by Sade-Feldman et al. 2018	CD38:CTLA4:ENTPD1:EPSTI1:FABP5:HAVCR2:NDUFB3:PDCD1:PRDX3:SIRPG:SNAP47:SNRPD1:UBE2F:WARS1:CXCL13:AFAP1L2:TNFRSF9:MYO7A:GOLIM4	PMID: 30388456	19
+CD8Tcell_Combes22	CD8_Tcell	Lymphoid_lineage_T/NKcell	11	5	CD8-positive T cell; derived from FACS-sorted tumor bulk RNAseq; Combes et al. Cell 2022	FASLG:CD8A:SETBP1:CTSW:APOBEC3C:APOBEC3G:BTNL8:HLA-DPB1:ULBP3:RAD51:WNT9A:HLA-DMA:CERS5:CD8B:NKG7:ZNF696:MCM5:DPF3:TTC24:YARS1:EBP:TRPS1:GZMH:VCAM1:LAG3:CRIM1:NAA40:GRIK4:PSMB9:HLA-DMB:SERP2:HOXB4:CASP7:TMCC2:ARPC5L:MCTP2:LYST	PMID: 34963056	37
+DualExpandedTcell_l_Wu20	CD8_Tcell	Lymphoid_lineage_T/NKcell	12	5	Dual-expanded T cells (CD8+, correlating with R to CIT); signature accoding to Wu et al. 2020 Supplementary Table 5	NKG7:CD8A:GZMH:CD8B:HCST:CST7:KLRD1:GZMA:CTSW:PRF1:GZMB:GZMM:KLRK1:HLA-C:KLRC4:AOAH:GNLY:MATK:ZNF683:ABI3:KLRC2	PMID: 32103181	21
+GoodCD8Tcell_l_SadeFeldman18	CD8_Tcell	Lymphoid_lineage_T/NKcell	13	5	TIL CD8-positive T cells associated with R to CIT, termed good T cells; signature by Sade-Feldman et al. 2018	IL7R:PLAC8:SELL:ADD3:TNFAIP8:TCF7	PMID: 30388456	6
+ResourceCD8Tcell_sc	CD8_Tcell	Lymphoid_lineage_T/NKcell	14	5	CD8-positive, alpha-beta resource T cell; data-derived v9	S1PR5:KLRG1:SLAMF6:CXCR3:S1PR1:ITGB7:CD8A:IL7R:TCF7:PDCD1	PMID: 34761219	10
+CMCD4Tcell_sc	Memory_Tcell	Lymphoid_lineage_T/NKcell	15	6	Central memory CD4-positive, alpha-beta T cell; data-derived v9	PKIA:TNFRSF4:AP3M2:AQP3:STING1:SERINC5:CD40LG	PMID: 34761219	7
+MemTcell_sc	Memory_Tcell	Lymphoid_lineage_T/NKcell	16	6	Memory T cell signature; use with case as unspecific; data-derived v8	GPR171:PKIA:AP3M2:SERINC5:PHACTR2:CD84:GZMK:IL7R	PMID: 34761219	8
+NaiTcell_l_Li19	Naive_Tcell	Lymphoid_lineage_T/NKcell	17	7	Naive T cell markers according to Li et al. Cell 2019	CCR7:IL7R:TCF7	PMID: 30595452	3
+NaiTcell_sc	Naive_Tcell	Lymphoid_lineage_T/NKcell	18	7	Naive T cell; data-derived v9	TCF7:LEF1:NELL2:CAMK4:MAL:TRABD2A	PMID: 34761219	6
+Tcell_markers	Tcell_general	Lymphoid_lineage_T/NKcell	19	8	T cell marker genes	MMP2:SERPINE1:CXCR4:CTLA4:CXCL3	PMID: 38049463	5
+Tcell_Combes22	Tcell_general	Lymphoid_lineage_T/NKcell	20	8	Alpha beta T cells; derived from FACS-sorted tumor bulk RNAseq; Combes et al. Cell 2022	CD40LG:TBX21:SH2D1A:PYHIN1:ZNF831:CD6:THEMIS:UBASH3A:TRAT1:EOMES:GRAP2:ZAP70:SIRPG:ICOS:FASLG:CD8A:CD8B:ITK:GZMA:KLRK1:GZMH:GZMK:CD3D:CD3E:CD3G	PMID: 34963056	25
+Tcell_IL7Rmax_sc	Tcell_general	Lymphoid_lineage_T/NKcell	21	8	IL7R-max T cell; same signature as CD4/CD8 IL7R-max T cell, possibly T-helper 17 cell; data-derived v8	CXCR6:SLC4A10:IL7R:IL18RAP:LGALS3:ZBTB16:CXXC5:NCR3:CEBPD:SLC4A10:CCR2:ADAM12:KLRB1:GZMK:PHACTR2	PMID: 34761219	15
+Tcell_l_Danaher17	Tcell_general	Lymphoid_lineage_T/NKcell	22	8	T cells; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	CD3D:CD3E:CD3G:CD6:SH2D1A:TRAT1	PMID: 28239471	6
+CytotoxSig_Davoli	Cytotoxic_Tcell	Lymphoid_lineage_T/NKcell	23	9	Davoli cytotoxic immune signature (Averaging the expression levels of cytotoxic immune signature genes)	CD247:CD2:CD3E:GZMH:NKG7:PRF1:GZMK	PMID: 28104840	7
+CytotoxTcell_Jiang	Cytotoxic_Tcell	Lymphoid_lineage_T/NKcell	24	9	Cytotoxic T lymphocytes markers (CTLs, averaging the expression levels of signature genes)	CD8A:CD8B:GZMA:GZMB:PRF1	PMID: 30127393	5
+CytoxAct_Rooney	Cytotoxic_Tcell	Lymphoid_lineage_T/NKcell	25	9	Rooney immune cytolytic activity (Averaging the expression levels of granzyme A (GZMA) and perforin (PRF1)	GZMA:PRF1	PMID: 25594174	2
+Cytotoxic_l_Danaher17	Cytotoxic_Tcell	Lymphoid_lineage_T/NKcell	26	9	Cytotoxic cells; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	CTSW:GNLY:GZMA:GZMB:GZMH:KLRB1:KLRD1:KLRK1:PRF1:NKG7	PMID: 28239471	10
+CytotoxTcell_sc	Cytotoxic_Tcell	Lymphoid_lineage_T/NKcell	27	9	Cytotoxic alpha-beta CD4 or CD8 T cell; data-derived v9	GZMH:KLRD1:FGFBP2:GZMB:PRF1:SAMD3:MATK:GNLY:NKG7:GZMA	PMID: 34761219	10
+CytoxTcell_l_Li19	Cytotoxic_Tcell	Lymphoid_lineage_T/NKcell	28	9	Cytotoxic T effector T cell markers according to Li et al. Cell 2019	GZMH:GNLY:FGFBP2:CX3CR1:KLF2:TBX21	PMID: 30595452	6
+ExhTcell_Jiang	Exhausted_Tcell	Lymphoid_lineage_T/NKcell	29	10	T-cell exhaustion Pos (Texh, averaging the expression levels of signature genes)	HSPA1B:HSPA1A:NR4A2:RGS1:TNFAIP3:CAMK2N1:DUSP1:NR4A3:IFIT3:IFIT1B:FOSB:SAMD3:MACC1:VPS37B:TF:DSEL:SPATA20:DHX58:SPP1:TRIM15:DUSP26:ABI3:SFN:C1QC:RTP4:JUN:BCKDHB:POU6F1:CYSLTR2:SLC14A1:RGS16:CUEDC1:DEDD2:CPEB1:CTSS:TMEM88:SKI:BTG1:SYCP2L:RGS2:ABCB1:ADRB2:CD69:RNF166:TNN	PMID: 30127393	45
+ExhCD8Tcell_l_Danaher17	Exhausted_Tcell	Lymphoid_lineage_T/NKcell	30	10	Exhausted-like CD8-positive T cells; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	CD244:EOMES:LAG3:PTGER4	PMID: 28239471	4
+ExhCD8Tcell_sc	Exhausted_Tcell	Lymphoid_lineage_T/NKcell	31	10	Exhausted-like alpha-beta CD8 T cell; data-derived v9	PDCD1:HAVCR2:LAG3:ENTPD1:CD38:TOX	PMID: 34761219	6
+ExhTcell_l_Li19	Exhausted_Tcell	Lymphoid_lineage_T/NKcell	32	10	Exhausted-like, dysfunctional T effector T cell markers according to Li et al. Cell 2019	TIGIT:PDCD1:LAG3:CXCL13:RBPJ:ZBED2:ETV1:ID3:MAF:PRDM1:EOMES:IFNG	PMID: 30595452	12
+ExhTcell_l_Tirosh16	Exhausted_Tcell	Lymphoid_lineage_T/NKcell	33	10	Exhausted-like T cell; obtained from literature https://science.sciencemag.org/content/sci/suppl/2016/04/07/352.6282.189.DC1/Tirosh.SM.pdf	CXCL13:TNFRSF1B:RGS2:TIGIT:CD27:TNFRSF9:SLA:RNF19A:INPP5F:XCL2:HLA-DMA:FAM3C:UQCRC1:WARS1:EIF3L:KCNK5:TMBIM6:CD200:ZC3H7A:SH2D1A:ATP1B3:MYO7A:THADA:PARK7:EGR2:FDFT1:CRTAM:IFI16	PMID: 27124452	28
+Target_marker_GeneBio	Immune_checkpoint	Lymphoid_lineage_T/NKcell	34	11	Immunotherapy target marker: PD1_PD-L1_CTLA4, Kong J H, et al. Nature communications, 2022, 13(1): 3703.	PDCD1:CD274:CTLA4	PMID:30127393	3
+Target_marker_CTLA4	Immune_checkpoint	Lymphoid_lineage_T/NKcell	35	11	Single target marker CTLA4	CTLA4	PMID:30127393,PMID:35764641	1
+Target_marker_PD1	Immune_checkpoint	Lymphoid_lineage_T/NKcell	36	11	Single target marker PDCD1	PDCD1	PMID:30127393,PMID:35764641	1
+Target_marker_PDL1	Immune_checkpoint	Lymphoid_lineage_T/NKcell	37	11	Single target marker CD274	CD274	PMID:30127393,PMID:35764641	1
+Immune_checkpoints	Immune_checkpoint	Lymphoid_lineage_T/NKcell	38	11	Immune Checkpoint	CD274:CTLA4:HAVCR2:LAG3:PDCD1:PDCD1LG2:TIGIT	PMID: 29443960	7
+RegTcell_Blood_l_Zhang18	Treg	Lymphoid_lineage_T/NKcell	39	12	Regulatory T cell signature according to Zhang et al. Nature 2018 - Cluster C10_CD4_FOXP3 from https://doi.org/10.1038/s41586-018-0694-x	FOXP3:IL2RA:IL10RA:IKZF2:RTKN2:CDC25B:S1PR4	PMID: 30479382	7
+RegTcell_Combes22	Treg	Lymphoid_lineage_T/NKcell	40	12	Regulatory T cell; derived from FACS-sorted tumor bulk RNAseq; Combes et al. Cell 2022	FOXP3:IL2RA:CD80:LAIR2:CCR8:CCL22:TNFRSF13B:TNFRSF18	PMID: 34963056	8
+RegTcell_l_Li19	Treg	Lymphoid_lineage_T/NKcell	41	12	Regulatory T cell markers according to Li et al. Cell 2019	FOXP3:IL2RA:IKZF2	PMID: 30595452	3
+RegTcell_sc	Treg	Lymphoid_lineage_T/NKcell	42	12	Regulatory T cell; data-derived v9	FOXP3:CCR8:CCR4:RTKN2:CTLA4	PMID: 34761219	5
+RegTcell_Tumor_l_Zhang18	Treg	Lymphoid_lineage_T/NKcell	43	12	Regulatory T cell signature according to Zhang et al. Nature 2018 Cluster C12_CD4_CTLA4 from https://doi.org/10.1038/s41586-018-0694-x	FOXP3:CCR8:TNFRSF18:LAYN:IKZF2:RTKN2:CTLA4:BATF:IL21R	PMID: 30479382	9
+CD56brightNK_sc	NKcell	Lymphoid_lineage_T/NKcell	44	13	CD56-bright cytokine secreting natural killer cell; data-derived v8	XCL1:SELL:CCR7:FUT7:KLRC1:TNFRSF18	PMID: 34761219	6
+CD56dimNK_l_Danaher17	NKcell	Lymphoid_lineage_T/NKcell	45	13	CD56-dim natural killer cells; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	IL21R:KIR2DL3:KIR3DL1:KIR3DL2	PMID: 28239471	4
+CD56dimNK_sc	NKcell	Lymphoid_lineage_T/NKcell	46	13	CD56-dim cytotoxic natural killer cell; data-derived v8	CD160:SPON2:FCGR3A:FGFBP2:S1PR5:FCRL6	PMID: 34761219	6
+NK_l_Danaher17	NKcell	Lymphoid_lineage_T/NKcell	47	13	Natural killer cells; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	NCR1:XCL2:XCL1	PMID: 28239471	3
+NKcell_sc	NKcell	Lymphoid_lineage_T/NKcell	48	13	Natural killer cell; data-derived v9	NCR1:LIM2:KIR2DL4:KLRC1:IL18RAP:KLRF1	PMID: 34761219	6
+ILC1	Innate_lymphoid_cell	Lymphoid_lineage_T/NKcell	49	14	Innate lympoid cell type 1 signature genes	EOMES:GZMB:HLA-E:IFNG:IL12RB1:IL12RB2:IL15RA:IL18RAP:IL2RB:KIR2DL1:KIR3DL1:NCR1:PRF1:RUNX3:STAT4:SYK:TBX21:TNF	PMID: 26065585	18
+ILC2	Innate_lymphoid_cell	Lymphoid_lineage_T/NKcell	50	14	Innate lympoid cell type 2 signature genes	BCL11B:CRLF2:GATA3:ICOS:IL13:IL17RB:IL2RA:IL4:IL5:IL9:KIT:MPL:RORA:TSLP:VIPR2	PMID: 26065585	15
+ILC3	Innate_lymphoid_cell	Lymphoid_lineage_T/NKcell	51	14	Innate lympoid cell type 3 signature genes	AHR:ARNTL:CCL20:CCR6:CD40LG:IL17A:IL17F:IL1R1:IL22:IL23R:LIF:LTA:LTBR:MADCAM1:NFKBIZ:NKX2-3:RORC:STAT3	PMID: 26065585	18
+cDC_CCR7_sc	cDC	Myeloid_lineage	52	15	CCR7-positive myeloid dendritic cell or regulatory/activated/mature myeloid dendritic cell; data-derived v9	CCL22:CCL17:CCL19:HMSD:NCCRP1:UBD:CRLF2	PMID: 34761219	7
+cDC_sc	cDC	Myeloid_lineage	53	15	Myeloid dendritic cell; data-derived v9	FLT3:UPK3A:CLEC9A:CCL22:ZNF366:CD1C	PMID: 34761219	6
+cDC1_Combes22	cDC	Myeloid_lineage	56	15	Classical dendritic cell type 1; derived from scRNA-seq; Combes et al. Cell 2022	IDO1:C1orf54:XCR1:CLEC9A:BATF3	PMID: 34963056	5
+cDC1_I_Liu2018	cDC	Myeloid_lineage	57	15	Classical dendritic cell type 1, refered to as Batf3+ DC genes; low expression associated with relapse in melanoma after adjuvant or neoadjuvant ipi+nivo; Liu et al. OncoImmunol 2018	BATF3:IRF8:THBD:CLEC9A	PMID: 30393586	4
+cDC1_sc	cDC	Myeloid_lineage	58	15	CD141-positive myeloid dendritic cell; data-derived v9	CLEC9A:XCR1:XCR1:CLNK:ENPP1:PPM1J:ZNF366	PMID: 34761219	7
+cDC2_Combes22	cDC	Myeloid_lineage	59	15	Classical dendritic cell type 2; derived from scRNA-seq; Combes et al. Cell 2022	FCER1A:CD1C:CD1E:CD1D:CLEC10A	PMID: 34963056	5
+cDC2_sc	cDC	Myeloid_lineage	60	15	CD1c-positive myeloid dendritic cell; data-derived v9	ENHO:CD1C:CLEC10A:CD1E	PMID: 34761219	4
+pDC_sc	pDC	Myeloid_lineage	61	16	Plasmacytoid dendritic cell; data-derived v9	CLEC4C:LILRA4:LRRC26:SCT:ASIP:SLC12A3:PTCRA	PMID: 34761219	7
+Macrophage_TAM	Macrophage	Myeloid_lineage	62	17	Tumor-associated macrophages(TAMs, averaging the expression levels of signature genes)	F13A1:FCER1A:CCL17:FOXQ1:ESPNL:CD1A:GATM:CCL13:PALLD:GALNT18:MAOA:RAMP1:STAB1:CCL26:PARM1:CD1E:ITM2C:CALCRL:CRH:RGS18:MS4A6A:DHRS2:PON2:ALOX15:RAB33A:MOCOS:IL17RB:FABP4:CMTM8:QPRT:CDR2L:DUOXA1:ABCC4:SYT17:PPP1R14A:PDGFC:GPT:FAM189A2:RASAL1:IPCEF1:ZNF366:MAP4K1:RAB30:PCED1B:TMIGD3:SH3BP4:RRS1:RNASE1	PMID: 30127393	48
+Macrophage_Combes22	Macrophage	Myeloid_lineage	63	17	Macrophage; derived from scRNA-seq; Combes et al. Cell 2022	APOE:TREM2:C1QB:C1QC:VSIG4	PMID: 34963056	5
+Macrophage_CXCL9_sc	Macrophage	Myeloid_lineage	64	17	CXCL9-positive macrophage; data-derived v9	CXCL10:CXCL11:CXCL9	PMID: 34761219	3
+Macrophage_l_Danaher17	Macrophage	Myeloid_lineage	65	17	Macrophages; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	CD163:CD68:CD84:MS4A4A	PMID: 28239471	4
+Macrophage_MARCO_sc	Macrophage	Myeloid_lineage	66	17	MARCO-positive macrophage; data-derived v9	MARCO:CXCL5:SLAMF9:MMP19	PMID: 34761219	4
+Macrophage_MSR1_sc	Macrophage	Myeloid_lineage	67	17	MSR1-positive macrophage; data-derived v9	TREM2:CD209:PLA2G7:SLCO2B1:SIGLEC1:FOLR2	PMID: 34761219	6
+Macrophage_sc	Macrophage	Myeloid_lineage	68	17	Macrophage; data-derived v9	VSIG4:MSR1:CD163:TREM2:LILRB5:SDS:SLCO2B1	PMID: 34761219	7
+ClassMonocyte_Combes22	Monocyte	Myeloid_lineage	69	18	Classical monocyte; derived from scRNA-seq; Combes et al. Cell 2022; Combes et al. Cell 2022	S100A8:S100A9:VCAN:FCN1:LYZ	PMID: 34963056	5
+ClassMonocyte_sc	Monocyte	Myeloid_lineage	70	18	Classical monocyte; data-derived v9	S100A12:CLEC4D:FCAR:MCEMP1	PMID: 34761219	4
+NClassMonocyte_sc	Monocyte	Myeloid_lineage	71	18	Non-classical monocyte; data-derived v9	LYPD2:GPBAR1:CDH23:LIPN:MS4A14	PMID: 34761219	5
+InflamMonocyte_sc	Monocyte	Myeloid_lineage	72	18	Inflammatory monocyte; data-derived v9	SOD2:IL1B:IER3:CAMP	PMID: 34761219	4
+Monocyte_sc	Monocyte	Myeloid_lineage	73	18	Monocyte; data-derived v9	CD300E:SLC11A1:CLEC12A:FCN1:LILRA5:LYPD2:S100A12	PMID: 34761219	7
+Myeloid_Combes22	Myeloid	Myeloid_lineage	74	19	Myeloid; derived from FACS-sorted tumor bulk RNAseq; Combes et al. Cell 2022	CLEC10A:CD1E:CD1C:VSIG4:CD33:CD300LB:MS4A7:LY86:CLEC5A:LILRB4:FCER1A:LILRB2:CSF1R:LILRA1:MPEG1:FCN1:RNASE6:FPR3:CYBB:MS4A4A:MS4A4E:OLR1:CD163:WDFY4:SIGLEC7:MS4A14:SIGLEC1:CD300E	PMID: 34963056	28
+Myeloid_sc	Myeloid	Myeloid_lineage	75	19	Myeloid leukocyte; data-derived v9	CSF3R:MS4A6A:MS4A7:MNDA:C5AR1:FCGR2A:C3AR1:FPR1:LILRB2:HDC:FCGR3B:CCL22	PMID: 34761219	12
+Basophil_sc	Granulocyte	Myeloid_lineage	76	20	Basophil; data-derived v9	CLC:MS4A3:HDC:CPA3:IL4	PMID: 34761219	5
+Eosinophil_sc	Granulocyte	Myeloid_lineage	77	20	Eosinophil; data-derived v9	CLC:PRG2:EPX:RNASE3:RNASE2:SIGLEC8:FUT9:CCR3	PMID: 34761219	8
+Granulocyte_sc	Granulocyte	Myeloid_lineage	78	20	Granulocyte; data-derived v9	MPO:CTSG:FCGR3B:CLC:HDC	PMID: 34761219	5
+Neutrophil_sc	Granulocyte	Myeloid_lineage	79	20	Neutrophil; data-derived v9	ELANE:MPO:PRTN3:CTSG:AZU1:FCGR3B	PMID: 34761219	6
+Mast_sc	Mast	Myeloid_lineage	80	21	Mast cell; data-derived v8	TPSAB1:CPA3:HPGDS:VWA5A	PMID: 34761219	4
+Mast_l_Danaher17	Mast	Myeloid_lineage	81	21	Mast cells; according to Danaher et al. Journal for ImmunoTherapy of Cancer 2017	MS4A2:TPSAB1:CPA3:HDC	PMID: 28239471	4
+Erythrocyte_sc	Erythrocyte	Myeloid_lineage	82	22	Erythrocyte; data-derived v8	PAN3:KCNN4:ERMAP:TPM1:HBB:AHSP:CA1:HBD	PMID: 34761219	8
+Platelet_sc	Platelet	Myeloid_lineage	83	23	Platelet; data-derived v9	ACRBP:GP9:ITGB3:PF4:PPBP:TREML1:TMEM40	PMID: 34761219	7
+HematoStem_sc	Stem	Mesenchymal_lineage	84	24	Hematopoietic stem cell; additional marker genes, mainly from PangalaoDB (May20)	AVP:CRHBP:CD34:NRIP1	PMID: 34761219	4
+Stroma_Combes22	Stroma	Mesenchymal_lineage	85	25	Non-immune CD45-, CD44+ and Thy1+ stromal cells; derived from FACS-sorted tumor bulk RNAseq; Combes et al. Cell 2022	CDH11:DCN:PDGFRA:COL1A2:ISLR:COL1A1:COL14A1:FNDC1:BGN:COL5A2:POSTN:PCDH18:ADAMTS12:MXRA5:SULF1:EDNRA:PRRX1:COL3A1:THY1:LUM:COL12A1	PMID: 34963056	21
+Pericyte_sc	Pericyte	Mesenchymal_lineage	86	26	Pericyte; data-derived v8	SOD3:CSPG4:RGS5:NDUFA4L2:COX4I2	PMID: 34761219	5
+Nurmik_CAFs	Fibroblast	Mesenchymal_lineage	87	27	Cancer-associated fibroblasts (CAFs, averaging the expression levels of signature genes )	FAP:ACTA2:MFAP5:COL11A1	PMID: 30734283	4
+Fibroblast_sc	Fibroblast	Mesenchymal_lineage	88	27	Fibroblast; data-derived v9	PDGFRB:DCN:PCOLCE:EMILIN1:CYGB:MFAP4:TCF21:BGN:ACTA2	PMID: 34761219	9
+InflamFibroblast_sc	Fibroblast	Mesenchymal_lineage	89	27	Inflammatory fibroblast; data-derived v9	IL11:CHI3L1:WNT2:CEMIP:COL7A1:MMP3	PMID: 34761219	6
+Endothelial_sc	Endothelial	Mesenchymal_lineage	90	28	Endothelial cell; data-derived v9	CDH5:ECSCR:KDR:TIE1:MYCT1:FLT4	PMID: 34761219	6
+Endothelial_Kahn20	Endothelial	Mesenchymal_lineage	91	28	Endothelial classifier using ElasticNet as transcriptional predictor for tumor vascularity, Kahn et al. 2020 https://www.jci.org/articles/view/136655.	ANGPT2:CDH5:ESAM:ESM1:ERG:ICAM2:TIE1	PMID: 33258803	7
+Cholangiocyte_sc	Epithelial	Mesenchymal_lineage	92	29	Cholangiocyte; data-derived v8	KRT7:SOX9:EPCAM:KRT19:TFF1:CLDN4:MMP7:TFF2:SFRP5:SLC12A2:CITED4:FGFR2	PMID: 34761219	12
+Epithelial_sc	Epithelial	Mesenchymal_lineage	93	29	Epithelial cell; data-derived v9	EPCAM:KLK1:SMIM22:LGALS4:CLDN7:CDH1:HMGCS2	PMID: 34761219	7
+Mesothelial_sc	Mesothelial	Mesenchymal_lineage	94	30	Mesothelial cell; data-derived v8	CCDC80:UPK3B:PLA2G2A:PTGIS:PRG4:CALB2	PMID: 34761219	6
+Adipocyte_sc	Adipocyte	Mesenchymal_lineage	95	31	Adipocyte; additional marker genes, mainly from PangalaoDB (May20)	LEP:FABP4:TCF21:ADIPOQ:P2RX5:UCP1:CIDEA:PRDM16:LHX8	PMID: 34761219	9
+Hepatocyte_sc	Hepatocyte	Mesenchymal_lineage	96	32	Hepatocyte; data-derived v8	ALDOB:APOH:PCK1:APOC3:TAT	PMID: 34761219	5
+PancreaticEndocrine_sc	Pancreatic	Mesenchymal_lineage	97	33	Pancreatic endocrine cell; data-derived v8	GCG:GC:IRX2:CRYBA2:INS:IAPP:HADH:ADCYAP1:MAFA:LEPR:RGS2:RBP4:BAIAP3:PPY:STMN2:DPYSL3:FGB:MEIS1	PMID: 34761219	18
+Pneumocyte_sc	Pneumocyte	Mesenchymal_lineage	98	34	Pneumocyte; data-derived v8	ABCA3:PGC:AGER:NAPSA:SPTB:CFTR	PMID: 34761219	6
+Anti apoptosis pathway	Apoptosis_pathway	Functional_group	99	35	Antiapoptosis genes	BCL2:BCL2L1:BCL2L2:MCL1	PMID:30792387	4
+Pro apoptotic pathway	Apoptosis_pathway	Functional_group	100	35	Proapoptotic genes	BAX:BID:BAD:BBC3:PMAIP1:BCL2L11:CASP3:CASP8:CASP9:FAS:FASLG:TNF	PMID: 30792387	12
+Fehrenbacher_Teff	IFNg_pathway	Functional_group	101	36	Fehrenbacher T-effector-IFN-y signature (Averaging the expression levels of T-effector IFN-? signature genes)	CD8A:GZMA:GZMB:IFNG:EOMES:CXCL9:CXCL10:TBX21	PMID: 26970723	8
+Ayers_IFNg6	IFNg_pathway	Functional_group	102	36	IFNG signature Ayers et al. JCI 2017	IDO1:CXCL10:CXCL9:HLA-DRA:STAT1:IFNG	PMID: 28650338	6
+Ayers_IFNg18	IFNg_pathway	Functional_group	103	36	Expanded immune gene signature, Ayers et al. JCI 2017	CD3D:IDO1:CIITA:CD3E:GZMK:CD2:HLA-DRA:CXCL13:IL2RG:NKG7:HLA-E:CXCR6:LAG3:TAGAP:CXCL10:STAT1:GZMB	PMID: 28650338	17
+IFNG_l_Rozeman21	IFNg_pathway	Functional_group	104	36	IFNG signature, CIT response-associated melanoma Rozeman et al. Nat Medicine 2021	IFNG:CCR5:CXCL11:IDO1:PRF1:GZMA:HLA-DRA:CXCL10:CXCL9:STAT1	PMID: 33558721	10
+TGFb_pan	TGFb_pathway	Functional_group	105	37	A pan-fibroblast TGFb response signature set (Pan-F-TBRS) by Gene expression profiling	ACTA2:ACTG2:ADAM12:ADAM19:CNN1:COL4A1:CTPS1:FSTL3:HSPB1:IGFBP3:PXDC1:SEMA7A:SH3PXD2A:TAGLN:TGFBI:TNS1:TPM1	PMID: 29443960	17
+EMT1	TGFb_pathway	Functional_group	106	37	Epithelial-tomesenchymal transition EMT1 by Gene expression profiling	CLDN3:CLDN7:CLDN4:CDH1:VIM:TWIST1:ZEB1:ZEB2	PMID: 29443960	8
+EMT2	TGFb_pathway	Functional_group	107	37	Epithelial-tomesenchymal transition EMT2 by Gene expression profiling	AXL:FAP:LOXL2:ROR2:TAGLN:TWIST2:WNT5A	PMID: 29443960	7
+EMT3	TGFb_pathway	Functional_group	108	37	Epithelial-tomesenchymal transition EMT3 by Gene expression profiling	FOXF1:GATA6:SOX9:TWIST1:ZEB1:ZEB2	PMID: 29443960	6
+TGFb_set	TGFb_pathway	Functional_group	109	37	TGF-beta pathway genes	TGFB1:ACVR1:TGFBR2	PMID: 29443960	3
+TGFb_CCR	TGFb_pathway	Functional_group	110	37	Cytokine-cytokine receptor interaction	ACVR1:CCL24:FLT4:IFNGR1:IL4R:IL6ST:KIT:LIF:PDGFA:PDGFRB:TGFB1:TGFBR2:TNFRSF10B:TNFRSF14:TNFRSF1A	PMID: 29443960	15
+Cytokine_Ils	Cytokine	Functional_group	111	38	Interleukins: These genes encode interleukins, a group of cytokines that play key roles in regulating immune cell proliferation, differentiation, and activation.	IL2:IL1B:IL10:IL19:IL6R:IL5:IL21:IL12B:IL23A:IL2RA:IL1F10:IL20:IL18:IL7:IL27:IL4:IL36A:IL25:IL36RN:IL34:IL1RN:IL15:IL9:IL17F:IL11:IL17C:IL17B:IL36G:IL32:IL24:IL31:IL17A:IL26:IL37:IL1A:IL3:IL33:IL22:IL16:IL6	PMID: 30184180	40
+Cytokine_TNF	Cytokine	Functional_group	112	38	Tumor Necrosis Factors: These genes encode members of the tumor necrosis factor family, which are involved in inflammation and apoptosis. They play a crucial role in immune system regulation and inflammatory responses.	FASLG:TNFSF12:TNF:TNFSF8:TNFSF13:TNFSF14:TNFSF18:TNFSF4:TNFSF11:TNFSF9:TNFSF10:TNFSF15:CD40LG:TNFRSF9:LTA:TNFRSF11B	PMID: 30184180	16
+Cytokine_IFNs	Cytokine	Functional_group	113	38	Interferons: These genes code for interferons, which are proteins known for their antiviral properties and ability to modulate the immune response.	IFNA7:IFNA6:IFNA4:IFNA2:IFNA8:IFNA10:IFNA1:IFNA13:IFNA17:IFNA21:IFNA5:IFNA14:IFNW1:IFNL2:IFNL1:IFNL3:IFNK:IFNG:IFNB1:IFNE	PMID: 30184180	20
+Cytokine_GF	Cytokine	Functional_group	114	38	Growth Factors: These genes produce growth factors, which are essential for stimulating cell growth, proliferation, and differentiation across various tissues and organs.	BMP2:BMP6:BMP15:BMP7:BMP8A:BMP8B:INHBA:INHBB:INHBC:INHBE:GDF9:GDF11:GDF15:GDF3:GDF5:GDF6:GDF7:BMP4:BMP5:BMP1:GREM1:OSM:TGFB3:LEFTY1:WNT2B:WNT7A:NOG:WNT5B:KITLG:WNT16:WNT2:BMP10:GREM2:WNT4:WNT3:ALKAL1:WNT9B:WNT6:WNT1:WNT9A:WNT3A:WNT10A:WNT10B:VEGFA:NAMPT:AIMP1:FGF2:THPO:MSTN:MYDGF:SCG2	PMID: 30184180	51
+Cytokine_CSF	Cytokine	Functional_group	115	38	Colony-Stimulating Factors: These genes code for colony-stimulating factors, which are cytokines that promote the survival, proliferation, and differentiation of hematopoietic cells in the bone marrow.	FLT3LG:CSF3:CNTF:CSF2:CSF1	PMID: 30184180	5
+Cytokine_Chemokines	Cytokine	Functional_group	116	38	Chemokines: These genes encode chemokines, a subgroup of cytokines that primarily function in chemotaxis, guiding the migration of cells towards sites of inflammation or injury.	CCL17:CCL2:CXCL8:CCL19:CXCL2:CXCL3:CXCL13:CCL24:CXCL9:XCL1:CCL8:CCL20:CCL11:CXCL6:CCL7:CXCL5:CCL13:CCL28:CXCL12:CCL1:CXCL17:CCL22:CCL25:CXCL10:CXCL1:CCL26:CXCL14:CXCL16:CXCL11:CX3CL1:XCL2:SCGB3A1	PMID: 30184180	32
+Messina_CKS	Cytokine	Functional_group	117	38	Messina 12-chemokine signature	CCL2:CCL8:CCL19:CCL21:CXCL9:CXCL10:CXCL11:CXCL13	PMID: 23097687	8
+Proliferating_G1S_sc	Cell_proliferation	Functional_group	118	39	Proliferating cell in phase G1-S; data-derived v8	ATAD2:BLM:BRIP1:CCNE2:CDC45:CDC6:CDCA7:CHAF1B:CLSPN:DTL:E2F8:EXO1:FEN1:GINS2:GMNN:HELLS:MCM2:MCM4:POLA1:RAD51:UNG	PMID: 34761219	21
+Proliferating_G2M_sc	Cell_proliferation	Functional_group	119	39	Proliferating cell in phase G2-M; data-derived v8	ANLN:AURKA:AURKB:BIRC5:CDC20:CDCA2:CDCA3:CDK1:CENPA:CENPE:KIF11:KIF23:MKI67:NEK2:TOP2A:UBE2C	PMID: 34761219	16
+Proliferating_sc	Cell_proliferation	Functional_group	120	39	Proliferating cell; scseq data-derived v8	MCM7:DTYMK:SKA2:SAE1:RFC2:GMPS:MKI67:PCNA:STMN1:HMGB2	PMID: 34761219	10
+TLS_v1_Cabrita20	TLS	Functional_group	121	40	New tertiary lympoid structure signature by Cabrita et al Nature 2020; was TLS_v1_l	CD79B:CD1D:LAT:SKAP1:CETP:EIF1AY:RBP5:PTGDS	PMID: 31942071	8
+TLS_v2_Cabrita20	TLS	Functional_group	122	40	Classical tertiary lymphoid structure-hallmark genes Cabrita et al Nature 2020; was TLS_v2_l	CCL19:CCL21:CXCL13:CCR7:CXCR5:SELL:LAMP3	PMID: 31942071	7
+DNA_replication	Genome_integrity	Functional_group	123	41	DNA replication, positively correlated with TMB	FEN1:LIG1:MCM2:MCM4:MCM7:POLD1:POLE:POLE3:RFC2:RNASEH2A:RPA1	PMID: 29443960	11
+Cell_cycle	Genome_integrity	Functional_group	124	41	Cell cycle, positively correlated with TMB	ANAPC2:CCNB1:CDC20:CDC25A:CDC45:CDC6:CDKN2B:E2F1:E2F2:ESPL1:MCM2:MCM4:MCM7:PKMYT1:TFDP1:TTK	PMID: 29443960	16
+Cell_cycle_reg	Genome_integrity	Functional_group	125	41	Cell cycle regulators by Gene expression and mutational profiling	ATM:CCND1:CCNE1:CDKN1A:CDKN2A:E2F3:FBXW7:MDM2:RB1:TP53	PMID: 29443960	10
+Nucleotide_excision_repair	Genome_integrity	Functional_group	126	41	Nucleotide excision repair, positively correlated with TMB	LIG1:POLD1:POLE:POLE3:RAD23A:RAD23B:RFC2:RPA1	PMID: 29443960	8
+Fanconi_anemia	Genome_integrity	Functional_group	127	41	Fanconi anemia pathway, positively correlated with TMB	ATRIP:EME1:FANCC:FANCG:RAD51:RMI1:RPA1	PMID: 29443960	7
+Homologous_recombination	Genome_integrity	Functional_group	128	41	Homologous recombination, positively correlated with TMB	EME1:POLD1:RAD51:RAD54L:RPA1	PMID: 29443960	5
+Base_excision_repair	Genome_integrity	Functional_group	129	41	Base excision repair, positively correlated with TMB	FEN1:LIG1:POLD1:POLE:POLE3	PMID: 29443960	5
+APOBEC_set	Genome_integrity	Functional_group	130	41	APOBECS genes	APOBEC3A:APOBEC3B	PMID: 29443960	2
+Ubiquitous_immune_sc	Reference	Functional_group	131	42	Ubiquitously expressed immune cell genes; data-derived v1	ACTB:HNRNPK:UBC:YWHAZ	PMC: 8484624	4
+Ubiquitous_sc	Reference	Functional_group	132	42	Ubiquitously expressed genes; data-derived v8	ACTB:HNRNPK:HNRNPU:SNRPD3:SRRM1:ZNF207	PMID: 34761219	6
+Reference_NanoString09	Reference	Functional_group	133	42	High, medium and low expressed reference genes; NanoString Tech Note 2009	ABCF1:ACTB:ALAS1:B2M:CLTC:G6PD:GAPDH:GUSB:HPRT1:LDHA:PGK1:POLR1B:POLR2A:RPL19:RPLP0:SDHA:TBP:TUBB	NanoString Tech Note 2009	18

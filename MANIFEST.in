@@ -1,0 +1,15 @@
+include AUTHORS
+
+include LICENSE
+include CITATION.cff
+include DESCRIPTION
+include CHANGELOG.txt
+include README.md
+include requirements.txt
+graft tornado_botocore
+global-exclude *.pyc
+
+
+#package data
+include compass/tokenizer/*
+include compass/model/*
