@@ -1,5 +1,8 @@
 # COMPASS Reproducibility (Pretraining from Scratch & Downstream Fine-Tuning)
 
+[![PyPI](https://img.shields.io/pypi/v/immuno-compass.svg)](https://pypi.org/project/immuno-compass/)
+![Repro version](https://img.shields.io/badge/Repro%20version-2.0.1-green)
+
 This branch provides a **fully reproducible pipeline** for the COMPASS model, including **pretraining from scratch** and **fine-tuning on downstream immunotherapy response datasets**.
 
 ---
@@ -69,6 +72,7 @@ If you prefer to regenerate the datasets from raw sources, please refer to:
 # you MUST use this specific version
 pip install immuno-compass==2.0.1
 ```
+
 
 ---
 
