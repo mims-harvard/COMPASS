@@ -110,4 +110,3 @@ def Adp_Tester(test_loader, model, optimizer, tsk_loss, device, ctp_idx):
     test_total_loss = np.mean(total_loss)
 
     return test_total_loss
-

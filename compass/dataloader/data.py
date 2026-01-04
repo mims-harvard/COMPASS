@@ -53,8 +53,6 @@ class TCGAData(Dataset):
         self.task_cols = dfy.columns
         self.task_dim = len(dfy.columns)
 
-        self.cancer_type = dfcx[dfcx.columns[0]].values
-        
         X = torch.tensor(dfcx.values, dtype=torch.float32).clone().detach()
         self.X = X
 
@@ -84,8 +82,6 @@ class TCGAData(Dataset):
         a = self.X[idx]
         topK_idx = self.knn_idx[idx]
 
-        topK_idx = [i for i in topK_idx if self.cancer_type[i] != self.cancer_type[idx]]  # filter the same cancer type
-        
         # positive sample augmentation
         xa = self.augmentor.augment_a(a)[0]
         xp = self.augmentor.augment_p(a)[0]

@@ -84,8 +84,6 @@ class CellPathwayAttentionAggregator(nn.Module):
         return aggregated_features
 
 
-
-
 class CellPathwayAggregator(nn.Module):
     def __init__(self, cellpathway_indices, mode="pooling", pooling_type="mean"):
         """

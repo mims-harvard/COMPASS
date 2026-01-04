@@ -40,8 +40,6 @@ class GeneSetPoolingAggregator(nn.Module):
         return aggregated_features
 
 
-
-        
 class GeneSetAttentionAggregator(nn.Module):
     def __init__(self, genesets_indices, softmax_mean=True):
         """

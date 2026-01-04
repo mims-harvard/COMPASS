@@ -67,7 +67,6 @@ class GeneSetScoreLinear(nn.Module):
         return scores
 
 
-
 class GeneSetScorer(nn.Module):
     def __init__(self, feature_dim, mode="linear", pooling_type="mean"):
         """

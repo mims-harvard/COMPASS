@@ -77,14 +77,19 @@ def FT_Trainer(
         y_true = anchor_y_true  # torch.cat([anchor_y_true, positive_y_true, negative_y_true])
         tsk = tsk_loss(y_pred, y_true)
 
+        #print(y_pred)
+        
         if entropy_weight != 0:
             entropy_reg = entropy_regularization(y_pred)
             tsk = tsk * (1 - entropy_weight) + entropy_reg * entropy_weight
 
+    
         loss = (1.0 - alpha) * lss + tsk * alpha
 
         # print(cv_loss, lss, loss)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
         optimizer.step()
 
         total_loss.append(loss.item())

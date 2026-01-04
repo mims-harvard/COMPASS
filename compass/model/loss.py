@@ -92,7 +92,6 @@ class MAEWithNaNLabelsLoss(nn.Module):
             return torch.tensor(0.0, device=labels.device, dtype=labels.dtype)
 
 
-
 class CEWithNaNLabelsLoss(nn.Module):
     def __init__(self, weights=None):
         super().__init__()
@@ -209,13 +208,24 @@ class HingeLoss(nn.Module):
         loss = F.relu(1 - y_true_transformed * y_pred_transformed)
         return torch.mean(loss)
 
-def entropy_regularization(logits):
-    probs = torch.softmax(logits, dim=1)
-    entropy = -torch.sum(
-        probs * torch.log(probs.clamp(min=1e-8)), dim=1
-    )
-    return entropy.mean()
 
+def entropy_regularization(logits):
+    """
+    Compute entropy from logits in a numerically stable way.
+
+    Parameters:
+    logits (torch.Tensor): Unnormalized model outputs (logits), shape (B, C)
+
+    Returns:
+    torch.Tensor: Mean entropy over the batch
+    """
+    # log p(y|x)
+    log_probs = F.log_softmax(logits, dim=1)   # 稳定
+    probs = torch.exp(log_probs)
+
+    entropy = -torch.sum(probs * log_probs, dim=1)
+    return entropy.mean()
+    
 
 def reference_consistency_loss(a, p, n, cross_triplet=True):
     # Stack the tensors to create a [b, 3] tensor for batch operation
