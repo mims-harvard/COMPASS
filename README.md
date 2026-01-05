@@ -108,5 +108,7 @@ jupyter nbconvert --to notebook --execute 06_analysis_loco.ipynb --output 06_ana
 ## 📌 Notes
 
 * This repository is intended for **methodological reproducibility**, not for matching a single reported checkpoint.
+* For close reproducibility, use the same weight initialization and document the GPU and PyTorch versions.
 * Minor numerical differences may occur due to hardware, CUDA versions, or random seeds.
 * For best reproducibility, fix random seeds and document GPU / PyTorch versions.
+* Minor numerical differences may occur due to variations in hardware setup, CUDA version and GPU configuration, or ML weight initialization.
