@@ -113,10 +113,6 @@ for seed in [24, 42, 64,]:
             train_X = cohort_X
             train_y = cohort_y
 
-            # if test_cohort == 'KIRC':
-            #     params['weight_decay'] = 1e-4
-            # else:
-            #      params['weight_decay'] = 1e-3
                 
             pretrainer = pretrainer.copy()
             finetuner = FineTuner(pretrainer, **params, 
