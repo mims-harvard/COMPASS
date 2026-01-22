@@ -4,24 +4,18 @@
   <img src="https://img.shields.io/badge/Figshare-DOI-blue?style=flat-square&logo=figshare" alt="TCGA DOI">
 </a> 
 
-This dataset contains **preprocessed TCGA transcriptomic data** used for COMPASS pretraining.  
-Both **2,475-gene (immune-focused)** and **15,672-gene (whole-transcriptome)** versions are provided.
 
-After downloading, place the files under the `data/` directory as follows:
+This dataset contains preprocessed TCGA transcriptomic profiles used for COMPASS pretraining.
+To facilitate reproducibility and efficient execution, we provide an immune-focused subset of 2,475 genes, which is sufficient to run all pretraining scripts in this repository.
 
+After downloading the dataset from Figshare, please organize the files under the data/ directory with the following structure:
 ```text
 data/
 └── TCGA/
-    ├── 2475/
-    │   ├── GENE.TABLE
-    │   ├── TCGA.PATIENT.PROCESSED.TABLE
-    │   ├── TCGA.PATIENT.TABLE
-    │   └── TCGA.TPM.TABLE
-    └── 15672/
-        ├── GENE.TABLE
-        ├── TCGA.PATIENT.PROCESSED.TABLE
-        ├── TCGA.PATIENT.TABLE
-        └── TCGA.TPM.TABLE
+    ├── GENE.TABLE
+    ├── TCGA.PATIENT.PROCESSED.TABLE
+    ├── TCGA.PATIENT.TABLE
+    └── TCGA.TPM.TABLE
 ````
 
 ---
