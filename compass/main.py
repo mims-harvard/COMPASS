@@ -60,11 +60,6 @@ def fixseed(seed=42):
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
         torch.cuda.manual_seed(seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-
-
-# fixseed(seed=42)
 
 
 def worker_init_fn(worker_id):
@@ -151,7 +146,6 @@ class PreTrainer:
         self.proj_cancer_type = proj_cancer_type
         self.ref_for_task = ref_for_task
 
-        fixseed(seed=seed)
         self.seed = seed
         self.patience = patience  # for early stopping
 
@@ -165,6 +159,7 @@ class PreTrainer:
 
     def _setup(self, input_dim, task_dim, task_type, save_dir, run_name):
 
+        fixseed(seed=64)
         model = Compass(
             input_dim,
             task_dim,

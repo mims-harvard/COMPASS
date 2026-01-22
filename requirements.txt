@@ -1,13 +1,13 @@
 torch==1.13.1 
 torchvision==0.14.1 
 torchaudio==0.13.1 
+seaborn==0.12.0
+statannotations==0.7.0
 einops
 scikit-learn 
 umap-learn 
 wandb
 matplotlib
-seaborn #==0.12.0
-statannotations==0.6.0
 comut
 gseapy ##ssGSEA
 tidepy # TIDE score

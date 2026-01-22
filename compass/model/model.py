@@ -22,9 +22,6 @@ def fixseed(seed=42):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
 
 
 class Compass(nn.Module):
@@ -87,7 +84,7 @@ class Compass(nn.Module):
         self.encoder_kwargs = encoder_kwargs
         self.seed = seed
 
-        fixseed(seed=self.seed)
+        #fixseed(seed=self.seed)
 
         self.inputencoder = TransformerEncoder(
             num_cancer_types=num_cancer_types,
