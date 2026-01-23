@@ -73,12 +73,11 @@ _, df_pred = model.predict(df_tpm, batch_size=128)
 
 ## 3. Extracting Features with a COMPASS Model
 
-Both pre-trained (PT) and fine-tuned (FT) COMPASS models can function as feature extractors. The extracted features-gene-level, geneset-level, or cell type/pathway-level-can be used for downstream tasks such as building a logistic regression model for response prediction or a Cox regression model for survival prediction.
+COMPASS models can function as feature extractors. The extracted features-gene-level, geneset-level, or cell type/pathway-level-can be used for downstream tasks such as building a logistic regression model for response prediction or a Cox regression model for survival prediction.
 
 ```python
-# Load any Compass model of your choice
-model = loadcompass('./model/pretrainer.pt') 
-# OR directly load the model from https://www.immuno-compass.com/download/model/pretrainer.pt 
+# Load COMPASS model and extract the features for a new cohort
+model = loadcompass('https://www.immuno-compass.com/download/model/finetuner_pft_all.pt') 
 dfgn, dfgs, dfct = model.extract(df_tpm, batch_size=128, with_gene_level=True)
 ```
 
@@ -102,7 +101,7 @@ Select one of the fine-tuning modes: 'FFT', 'PFT', or 'LFT'. For small datasets 
 
 ### Example Fine-Tuning Process
 ```python
-model = loadcompass('./model/finetuner_pft_all.pt')  
+model = loadcompass('https://www.immuno-compass.com/download/model/LOCO/pft_leave_Gide.pt')  
 ft_args = {'mode': 'PFT', 'lr': 1e-3, 'batch_size': 16, 'max_epochs': 100, 'load_decoder': True}
 
 finetuner = FineTuner(model, **ft_args)
@@ -129,7 +128,7 @@ tcga_train_sample = pd.read_csv('./data/tcga_example_train.tsv', sep='\t', index
 tcga_test_sample = pd.read_csv('./data/tcga_example_test.tsv', sep='\t', index_col=0)
 
 # Define pre-training hyperparameters
-pt_args = {'lr': 1e-3, 'batch_size': 96, 'epochs': 20, 'seed':42}
+pt_args = {'lr': 1e-3, 'batch_size': 128, 'epochs': 20}
 pretrainer = PreTrainer(**pt_args)
 
 # Train the model using the provided training and test datasets
