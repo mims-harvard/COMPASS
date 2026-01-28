@@ -159,7 +159,7 @@ class PreTrainer:
 
     def _setup(self, input_dim, task_dim, task_type, save_dir, run_name):
 
-        fixseed(seed=64)
+        #fixseed(seed=64)
         model = Compass(
             input_dim,
             task_dim,
