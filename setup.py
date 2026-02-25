@@ -29,7 +29,6 @@ TEST_DEPENDENCIES = ["pytest"]
 EXTRA_DEPENDENCIES = {"dev": ["pytest"]}
 
 
-    
 if sys.version_info < REQUIRED_PYTHON_VERSION:
     sys.exit("Python >= 3.12 is required. Your version:\n" + sys.version)
 

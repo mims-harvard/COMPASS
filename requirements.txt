@@ -3,14 +3,14 @@ torchvision #0.25.0
 torchaudio #2.10.0
 einops
 scikit-learn 
-umap-learn 
+umap-learn
 wandb
 matplotlib
 seaborn==0.12.0
 statannotations==0.7.0
 comut
 gseapy ##ssGSEA
-tidepy # TIDE score
+tidepy #TIDE score
 colorcet
 gdown
 qnorm

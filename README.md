@@ -20,26 +20,11 @@ An `example2run.ipynb` under the example folder is provided to run below experim
 #### Installation
 
 ```bash
-conda create -n compass_tc2 python=3.12
-conda activate compass_tc2
+conda create -n compass python=3.12
+conda activate compass
 pip install immuno-compass -U
 ```
 
-> **⚡ GPU (CUDA) Support:**
-> By default, `pip install immuno-compass` will install the CPU-only version of PyTorch.
-> If you want GPU acceleration, **please manually install the CUDA-enabled version of torch** *before* installing other dependencies. For example, for CUDA 11.7:
->
-> ```bash
-> pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-> ```
->
-> For other CUDA versions, see the [PyTorch official installation guide](https://pytorch.org/get-started/locally/).
->
-> If you use `conda`, you can install GPU-enabled torch with:
->
-> ```bash
-> conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
-> ```
 
 #### Importing COMPASS
 
@@ -97,7 +82,7 @@ If you have in-house data and would like to fine-tune a COMPASS model with your 
 ```python
 ft_args = {'load_decoder': True}
 ```
-Select one of the fine-tuning modes: 'FFT', 'PFT', or 'LFT'. For small datasets (n<50), 'LFT' is recommended. 
+Select one of the fine-tuning modes: 'FFT', 'PFT', or 'LFT'. For very small datasets (n<30), 'LFT' is recommended. 
 
 ### Example Fine-Tuning Process
 ```python
