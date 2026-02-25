@@ -20,8 +20,8 @@ An `example2run.ipynb` under the example folder is provided to run below experim
 #### Installation
 
 ```bash
-conda create -n compass python=3.8
-conda activate compass
+conda create -n compass_tc2 python=3.12
+conda activate compass_tc2
 pip install immuno-compass -U
 ```
 
@@ -30,7 +30,7 @@ pip install immuno-compass -U
 > If you want GPU acceleration, **please manually install the CUDA-enabled version of torch** *before* installing other dependencies. For example, for CUDA 11.7:
 >
 > ```bash
-> pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --index-url https://download.pytorch.org/whl/cu117
+> pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 > ```
 >
 > For other CUDA versions, see the [PyTorch official installation guide](https://pytorch.org/get-started/locally/).

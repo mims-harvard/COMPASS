@@ -20,7 +20,7 @@ AUTHOR = "WanXiang Shen"
 DESCRIPTION = "COMPASS: Generalizable AI predicts immunotherapy outcomes across cancers and treatments."
 URL = "https://github.com/mims-harvard/COMPASS/tree/main"
 
-REQUIRED_PYTHON_VERSION = (3, 8)
+REQUIRED_PYTHON_VERSION = (3, 12)
 PACKAGES = find_packages(exclude = ['test', 'gallery', 'misc', 'example', '.ipynb_checkpoints',])
 
 INSTALL_DEPENDENCIES = parse_requirements('./requirements.txt')
@@ -31,7 +31,7 @@ EXTRA_DEPENDENCIES = {"dev": ["pytest"]}
 
     
 if sys.version_info < REQUIRED_PYTHON_VERSION:
-    sys.exit("Python >= 3.8 is required. Your version:\n" + sys.version)
+    sys.exit("Python >= 3.12 is required. Your version:\n" + sys.version)
 
 
 class PyTest(TestCommand):

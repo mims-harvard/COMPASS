@@ -39,6 +39,19 @@ class DRNet(nn.Module):
         return x
 
 
+# class GeneSetScoreLinear(nn.Module):
+#     def __init__(self, feature_dim, num_genesets):
+#         super().__init__()
+#         self.weight = nn.Parameter(torch.randn(num_genesets, feature_dim))
+#         self.bias = nn.Parameter(torch.zeros(num_genesets))
+#         nn.init.xavier_uniform_(self.weight.unsqueeze(0))
+    
+#     def forward(self, x):
+#         # x: (B, K, C)  →  scores: (B, K)
+#         scores = (x * self.weight.unsqueeze(0)).sum(dim=-1) + self.bias
+#         return scores
+
+
 class GeneSetScoreLinear(nn.Module):
     def __init__(self, feature_dim):
         """

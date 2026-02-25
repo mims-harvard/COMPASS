@@ -92,29 +92,34 @@ class MAEWithNaNLabelsLoss(nn.Module):
             return torch.tensor(0.0, device=labels.device, dtype=labels.dtype)
 
 
+
 class CEWithNaNLabelsLoss(nn.Module):
     def __init__(self, weights=None):
-        super(CEWithNaNLabelsLoss, self).__init__()
+        super().__init__()
         self.weights = weights
 
-    def forward(self, predictions, labels):
+    def forward(self, logits, labels):
         """
-        predictions: softmax ouput
-        labels: groudtruth labels
+        logits: (B, C) raw logits
+        labels: (B, C) one-hot / soft labels, may contain NaN
         """
-        mask = ~torch.isnan(labels)[:, 0]
-        if mask.any():
-            y_true = labels[mask]
-            y_pred = predictions[mask]
-            if self.weights is None:
-                loss = F.cross_entropy(y_pred, y_true)
-            else:
-                weights = torch.tensor(self.weights).to(y_true.device)
-                loss = F.cross_entropy(y_pred, y_true, weight=weights)
-            return loss
-        else:
-            return torch.tensor(0.0, device=labels.device, dtype=labels.dtype)
+        # mask rows with any NaN
+        mask = ~torch.isnan(labels).any(dim=1)
+        if not mask.any():
+            return torch.tensor(0.0, device=labels.device)
 
+        y_pred = logits[mask]                 # (B, C)
+        y_true = labels[mask].argmax(dim=1)   # (B,)
+
+        if self.weights is None:
+            return F.cross_entropy(y_pred, y_true)
+        else:
+            w = torch.tensor(
+                self.weights,
+                device=y_true.device,
+                dtype=torch.float,
+            )
+            return F.cross_entropy(y_pred, y_true, weight=w)
 
 class FocalLoss(nn.Module):
     """Focal loss for class imbalance (Lin et al., 2020)."""

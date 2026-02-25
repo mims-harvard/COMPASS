@@ -68,6 +68,11 @@ def fixseed(seed=42):
 
 # fixseed(seed=42)
 
+def freeze_bn_dropout(m):
+    if isinstance(m, (torch.nn.BatchNorm1d, torch.nn.BatchNorm2d, 
+                      torch.nn.BatchNorm3d, torch.nn.Dropout)):
+        m.eval()
+        
 
 def worker_init_fn(worker_id):
     seed = torch.initial_seed() % 2**32
@@ -83,16 +88,15 @@ class PreTrainer:
         weight_decay=1e-6,
         epochs=100,
         patience=10,
-        batch_size=64,
-        embed_dim=32,
+        batch_size=128,
         task_loss_weight=0.0,
         task_dense_layer=[24],
         task_batch_norms=True,
         task_class_weight=None,
         encoder="transformer",
         encoder_dropout=0.2,
+        encoder_lr=1e-8,
         num_cancer_types=33,
-        transformer_dim=32,
         transformer_num_layers=1,
         transformer_nhead=2,
         transformer_pos_emb="learnable",
@@ -110,7 +114,7 @@ class PreTrainer:
         with_wandb=False,
         wandb_project="pretrain",
         wandb_dir="./wandb/",
-        wandb_entity="senwanxiang",
+        wandb_entity="yourname",
         **encoder_kwargs,
     ):
         """
@@ -118,12 +122,13 @@ class PreTrainer:
         encoder:{'mlp', 'transformer'}
         """
 
+        emb_dim = 32
         self.device = device
         self.lr = lr
         self.weight_decay = weight_decay
         self.epochs = epochs
         self.batch_size = batch_size
-        self.embed_dim = embed_dim
+        self.embed_dim = emb_dim
         self.num_cancer_types = num_cancer_types
 
         self.triplet_margin = triplet_margin
@@ -137,7 +142,7 @@ class PreTrainer:
         self.task_class_weight = task_class_weight
         self.encoder = encoder
         self.encoder_dropout = encoder_dropout
-        self.transformer_dim = transformer_dim
+        self.transformer_dim = emb_dim
         self.transformer_nhead = transformer_nhead
         self.transformer_num_layers = transformer_num_layers
         self.transformer_pos_emb = transformer_pos_emb
@@ -159,7 +164,8 @@ class PreTrainer:
         self.wandb_dir = wandb_dir
         self.wandb_entity = wandb_entity
         self.encoder_kwargs = encoder_kwargs
-
+        self.encoder_lr = encoder_lr
+        
     def _setup(self, input_dim, task_dim, task_type, save_dir, run_name):
 
         model = Compass(
@@ -193,9 +199,9 @@ class PreTrainer:
 
         _remap_distilled_encoder(self) # knowledge-distilled from the FlashAttention-based weights
         plist = [
-                {"params": model.inputencoder.parameters(), 'lr': 1e-8},
-                {"params": model.latentprojector.parameters()},  
-                {"params": model.taskdecoder.parameters()},  
+                {"params": model.inputencoder.parameters(), 'lr': self.encoder_lr},
+                {"params": model.latentprojector.parameters(), 'lr': self.lr},  
+                {"params": model.taskdecoder.parameters(), 'lr': self.lr},  
                 ]
 
         optimizer = torch.optim.Adam(plist, lr=self.lr, weight_decay=self.weight_decay)
@@ -441,6 +447,10 @@ class PreTrainer:
             )
 
     def predict(self, df_tpm, batch_size=512, num_workers=4):
+        cols = []
+        cols.append(df_tpm.columns[0])
+        cols.extend(self.feature_name)
+        df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
         model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
         model = model.to(self.device)
@@ -455,6 +465,10 @@ class PreTrainer:
         return dfe, dfp
 
     def extract(self, df_tpm, batch_size=512, num_workers=4, with_gene_level=False):
+        cols = []
+        cols.append(df_tpm.columns[0])
+        cols.extend(self.feature_name)
+        df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
         model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
         model = model.to(self.device)
@@ -473,6 +487,12 @@ class PreTrainer:
             return dfgs, dfct
 
     def project(self, df_tpm, batch_size=512, num_workers=4):
+
+        cols = []
+        cols.append(df_tpm.columns[0])
+        cols.extend(self.feature_name)
+        df_tpm = df_tpm[cols]
+
         model = Compass(**self.saver.inMemorySave["model_args"])
         model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
         model = model.to(self.device)
@@ -738,6 +758,7 @@ class FineTuner:
         device="cuda",
         lr=1e-3,
         weight_decay=1e-4,
+        lr_decay = 1e-1,
         max_epochs=500,
         patience=10,
         batch_size=32,
@@ -754,8 +775,8 @@ class FineTuner:
         verbose=True,
         with_wandb=False,
         wandb_project="finetune",
-        wandb_dir="/n/data1/hms/dbmi/zitnik/lab/users/was966/wandb/",
-        wandb_entity="senwanxiang",
+        wandb_dir="./wandb/",
+        wandb_entity="yourname",
         work_dir="./results",
         task_name="rps",
         task_type="c",
@@ -805,13 +826,15 @@ class FineTuner:
         self.task_name = task_name
         self.task_dim = task_dim
         self.save_best_model = save_best_model
-
+        self.lr_decay = lr_decay
+        
         self.params = {
             "mode": self.mode,
             "load_decoder": self.load_decoder,
             "device": self.device,
             "lr": self.lr,
             "weight_decay": self.weight_decay,
+            'lr_decay':self.lr_decay,
             "max_epochs": self.max_epochs,
             "patience": self.patience,
             "batch_size": self.batch_size,
@@ -905,30 +928,38 @@ class FineTuner:
         model = model.to(self.device)
 
         if self.mode == "LFT":
-            for param in model.inputencoder.parameters():
-                param.requires_grad = False
-            for param in model.latentprojector.parameters():
-                param.requires_grad = False
-            plist = [{"params": model.taskdecoder.parameters()}]
-
+            model.train()
+            model.inputencoder.apply(freeze_bn_dropout)
+            model.latentprojector.apply(freeze_bn_dropout)
+            model.taskdecoder.train()
+            plist = [
+                {"params": model.inputencoder.parameters(), "lr": self.lr * self.lr_decay},
+                {"params": model.latentprojector.parameters(), "lr": self.lr * self.lr_decay},
+                {"params": model.taskdecoder.parameters(), "lr": self.lr},
+            ]
+        
         elif self.mode == "PFT":
-            for param in model.inputencoder.parameters():
-                param.requires_grad = False
+            model.train()
+            model.inputencoder.apply(freeze_bn_dropout)
+            model.latentprojector.train()
+            model.taskdecoder.train()
             plist = [
-                {"params": model.latentprojector.parameters()},  # , 'lr': 5e-3
-                {"params": model.taskdecoder.parameters()},  # , 'lr': 1e-3
+                {"params": model.inputencoder.parameters(), "lr": self.lr * self.lr_decay},
+                {"params": model.latentprojector.parameters(), "lr": self.lr},
+                {"params": model.taskdecoder.parameters(), "lr": self.lr},
             ]
-
+        
         elif self.mode == "FFT":
-            # with/wo layer decay
+            model.train()
             plist = [
-                {"params": model.inputencoder.parameters()},  # , 'lr': 1e-6
-                {"params": model.latentprojector.parameters()},  # , 'lr': 1e-5
-                {"params": model.taskdecoder.parameters()},  # , 'lr': 1e-3
+                {"params": model.inputencoder.parameters(), "lr": self.lr},
+                {"params": model.latentprojector.parameters(), "lr": self.lr},
+                {"params": model.taskdecoder.parameters(), "lr": self.lr},
             ]
+     
         else:
             raise ValueError("Invalid mode type. Use 'PFT','LFT' or 'FFT'. ")
-
+            
         optimizer = torch.optim.Adam(plist, lr=self.lr, weight_decay=self.weight_decay)
         return model, optimizer
 
@@ -1274,6 +1305,10 @@ class FineTuner:
         return self
 
     def predict(self, df_tpm, batch_size=512, num_workers=4):
+        cols = []
+        cols.append(df_tpm.columns[0])
+        cols.extend(self.feature_name)
+        df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
         model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
         model = model.to(self.device)
@@ -1288,6 +1323,10 @@ class FineTuner:
         return dfe, dfp
 
     def extract(self, df_tpm, batch_size=512, num_workers=4, with_gene_level=False):
+        cols = []
+        cols.append(df_tpm.columns[0])
+        cols.extend(self.feature_name)
+        df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
         model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
         model = model.to(self.device)
@@ -1306,6 +1345,10 @@ class FineTuner:
             return dfgs, dfct
 
     def project(self, df_tpm, batch_size=512, num_workers=4):
+        cols = []
+        cols.append(df_tpm.columns[0])
+        cols.extend(self.feature_name)
+        df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
         model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
         model = model.to(self.device)
