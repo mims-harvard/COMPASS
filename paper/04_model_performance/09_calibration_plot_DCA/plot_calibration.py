@@ -155,7 +155,7 @@ def plot_calibration(
     ax.plot([0, 1], [0, 1], "--", color="gray", linewidth=1, zorder=1)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
-    ax.set_xlabel("Predicted probability")
+    ax.set_xlabel("Predicted response probability")
     ax.set_ylabel("Observed response rate")
 
     if label:
