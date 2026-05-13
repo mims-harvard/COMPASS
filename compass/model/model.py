@@ -141,6 +141,7 @@ class Compass(nn.Module):
             "input_dim": self.input_dim,
             "task_dim": self.task_dim,
             "task_type": self.task_type,
+            "ref_for_task":ref_for_task,
             "proj_level": self.proj_level,
             "proj_pid": self.proj_pid,
             "proj_cancer_type": self.proj_cancer_type,
@@ -181,6 +182,16 @@ class Compass(nn.Module):
                 seed=self.seed,
             )
 
+        ## classification task
+        elif task_type == "co":
+            self.taskdecoder = ClassDecoderOrg(
+                input_dim=self.embed_dim,
+                dense_layers=task_dense_layer,
+                out_dim=task_dim,
+                batch_norms=task_batch_norms,
+                seed=self.seed,
+            )
+            
         # for softmax classifier
         elif task_type == "f":
             self.taskdecoder = ProtoNetDecoder(

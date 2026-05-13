@@ -1,1 +1,1 @@
-from .decoder import ClassDecoder, RegDecoder, ProtoNetDecoder, ProtoNetNFTDecoder
+from .decoder import ClassDecoder, ClassDecoderOrg, RegDecoder, ProtoNetDecoder, ProtoNetNFTDecoder

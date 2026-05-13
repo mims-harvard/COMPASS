@@ -55,6 +55,7 @@ from compass.utils import (
     loadcompass,
 )  #  code for compass model loading
 
+
 def fixseed(seed=42):
     np.random.seed(seed)
     random.seed(seed)
@@ -79,6 +80,29 @@ def worker_init_fn(worker_id):
     np.random.seed(seed)
 
 
+
+
+def load_compass_auto(model_args, state_dict, device="cpu"):
+    
+    model = Compass(**model_args).to(device)
+    keys = set(state_dict.keys())
+    markers = [ "taskdecoder.input_norm.weight", "taskdecoder.out.weight"]
+
+    if any(k in keys for k in markers):
+        print("[INFO] Detected org ClassDecoder checkpoint.")
+        from compass.decoder import ClassDecoder, ClassDecoderOrg
+        model.taskdecoder = ClassDecoderOrg(
+            input_dim=model.embed_dim,
+            dense_layers=model.task_dense_layer,
+            out_dim=model.task_dim,
+            batch_norms=model.task_batch_norms,
+            seed=model.seed,
+        ).to(device)
+
+    model.load_state_dict(state_dict, strict=True)
+    return model
+
+
 class PreTrainer:
 
     def __init__(
@@ -96,6 +120,7 @@ class PreTrainer:
         encoder="transformer",
         encoder_dropout=0.2,
         encoder_lr=1e-8,
+        encoder_distill = False,
         num_cancer_types=33,
         transformer_num_layers=1,
         transformer_nhead=2,
@@ -142,6 +167,8 @@ class PreTrainer:
         self.task_class_weight = task_class_weight
         self.encoder = encoder
         self.encoder_dropout = encoder_dropout
+        self.encoder_lr = encoder_lr
+        self.encoder_distill = encoder_distill
         self.transformer_dim = emb_dim
         self.transformer_nhead = transformer_nhead
         self.transformer_num_layers = transformer_num_layers
@@ -164,7 +191,7 @@ class PreTrainer:
         self.wandb_dir = wandb_dir
         self.wandb_entity = wandb_entity
         self.encoder_kwargs = encoder_kwargs
-        self.encoder_lr = encoder_lr
+
         
     def _setup(self, input_dim, task_dim, task_type, save_dir, run_name):
 
@@ -197,13 +224,20 @@ class PreTrainer:
         ce_loss = CEWithNaNLabelsLoss(weights=self.task_class_weight)
         mae_loss = MAEWithNaNLabelsLoss()
 
-        _remap_distilled_encoder(self) # knowledge-distilled from the FlashAttention-based weights
-        plist = [
-                {"params": model.inputencoder.parameters(), 'lr': self.encoder_lr},
-                {"params": model.latentprojector.parameters(), 'lr': self.lr},  
-                {"params": model.taskdecoder.parameters(), 'lr': self.lr},  
-                ]
-
+        if self.encoder_distill:
+            _remap_distilled_encoder(self) # knowledge-distilled from the FlashAttention-based weights
+            plist = [
+                    {"params": model.inputencoder.parameters(), 'lr': self.encoder_lr},
+                    {"params": model.latentprojector.parameters(), 'lr': self.lr},  
+                    {"params": model.taskdecoder.parameters(), 'lr': self.lr},  
+                    ]
+        else:
+            plist = [
+                    {"params": model.inputencoder.parameters(), 'lr': self.lr},
+                    {"params": model.latentprojector.parameters(), 'lr': self.lr},  
+                    {"params": model.taskdecoder.parameters(), 'lr': self.lr},  
+                    ]  
+    
         optimizer = torch.optim.Adam(plist, lr=self.lr, weight_decay=self.weight_decay)
         saver = SaveBestModel(save_dir=save_dir, save_name="model.pth")
 
@@ -452,7 +486,10 @@ class PreTrainer:
         cols.extend(self.feature_name)
         df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
-        model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
+        ret = model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
+        
+        print("missing_keys:", ret.missing_keys)
+        print("unexpected_keys:", ret.unexpected_keys)
         model = model.to(self.device)
         dfe, dfp = Predictor(
             df_tpm,
@@ -470,7 +507,9 @@ class PreTrainer:
         cols.extend(self.feature_name)
         df_tpm = df_tpm[cols]
         model = Compass(**self.saver.inMemorySave["model_args"])
-        model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
+        ret = model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
+        print("missing_keys:", ret.missing_keys)
+        print("unexpected_keys:", ret.unexpected_keys)
         model = model.to(self.device)
         dfg, dfgs, dfct = Extractor(
             df_tpm,
@@ -494,7 +533,9 @@ class PreTrainer:
         df_tpm = df_tpm[cols]
 
         model = Compass(**self.saver.inMemorySave["model_args"])
-        model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
+        ret = model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
+        print("missing_keys:", ret.missing_keys)
+        print("unexpected_keys:", ret.unexpected_keys)
         model = model.to(self.device)
         dfg, dfc = Projector(
             df_tpm,
@@ -1309,9 +1350,11 @@ class FineTuner:
         cols.append(df_tpm.columns[0])
         cols.extend(self.feature_name)
         df_tpm = df_tpm[cols]
-        model = Compass(**self.saver.inMemorySave["model_args"])
-        model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
-        model = model.to(self.device)
+        
+        model_args = self.saver.inMemorySave["model_args"]
+        state_dict = self.saver.inMemorySave["model_state_dict"]
+        model = load_compass_auto(model_args, state_dict, device=self.device)     
+        
         dfe, dfp = Predictor(
             df_tpm,
             model,
@@ -1327,9 +1370,11 @@ class FineTuner:
         cols.append(df_tpm.columns[0])
         cols.extend(self.feature_name)
         df_tpm = df_tpm[cols]
-        model = Compass(**self.saver.inMemorySave["model_args"])
-        model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
-        model = model.to(self.device)
+        
+        model_args = self.saver.inMemorySave["model_args"]
+        state_dict = self.saver.inMemorySave["model_state_dict"]
+        model = load_compass_auto(model_args, state_dict, device=self.device)       
+        
         dfg, dfgs, dfct = Extractor(
             df_tpm,
             model,
@@ -1349,9 +1394,11 @@ class FineTuner:
         cols.append(df_tpm.columns[0])
         cols.extend(self.feature_name)
         df_tpm = df_tpm[cols]
-        model = Compass(**self.saver.inMemorySave["model_args"])
-        model.load_state_dict(self.saver.inMemorySave["model_state_dict"], strict=False)
-        model = model.to(self.device)
+        
+        model_args = self.saver.inMemorySave["model_args"]
+        state_dict = self.saver.inMemorySave["model_state_dict"]
+        model = load_compass_auto(model_args, state_dict, device=self.device)       
+        
         dfg, dfc = Projector(
             df_tpm,
             model,
@@ -1439,7 +1486,7 @@ class FineTuner:
                 self.pretrainer,
                 **param,
                 task_name="fold_%s" % i,
-                task_type="c",
+                task_type=self.task_type,
             )
 
             tuner.tune(
