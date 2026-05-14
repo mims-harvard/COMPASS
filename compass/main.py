@@ -967,7 +967,7 @@ class FineTuner:
         ### load Pretrained model
         model.load_state_dict(encoder_state, strict=False)
         model = model.to(self.device)
-
+        
         if self.mode == "LFT":
             model.train()
             model.inputencoder.apply(freeze_bn_dropout)

@@ -8,7 +8,7 @@ Created on Fri Nov  3 13:31:25 2023
 import torch
 import torch.nn as nn
 from ..encoder import TransformerEncoder, MLPEncoder
-from ..decoder import ClassDecoder, RegDecoder, ProtoNetDecoder
+from ..decoder import ClassDecoder, ClassDecoderOrg, RegDecoder, ProtoNetDecoder
 from ..projector import DisentangledProjector, EntangledProjector
 
 
@@ -202,6 +202,9 @@ class Compass(nn.Module):
                 seed=self.seed,
             )
 
+        else:
+            raise ValueError("Invalid task_type. Use 'c', 'co', 'f' or 'r'. ")
+    
     def forward(self, x):
 
         # output： B,L+2, (dataset:1, cancer:1, gene),C
