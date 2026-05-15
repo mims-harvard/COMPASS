@@ -80,25 +80,8 @@ def worker_init_fn(worker_id):
     np.random.seed(seed)
 
 
-
-
 def load_compass_auto(model_args, state_dict, device="cpu"):
-    
     model = Compass(**model_args).to(device)
-    keys = set(state_dict.keys())
-    markers = [ "taskdecoder.input_norm.weight", "taskdecoder.out.weight"]
-
-    if any(k in keys for k in markers):
-        print("[INFO] Detected org ClassDecoder checkpoint.")
-        from compass.decoder import ClassDecoder, ClassDecoderOrg
-        model.taskdecoder = ClassDecoderOrg(
-            input_dim=model.embed_dim,
-            dense_layers=model.task_dense_layer,
-            out_dim=model.task_dim,
-            batch_norms=model.task_batch_norms,
-            seed=model.seed,
-        ).to(device)
-
     model.load_state_dict(state_dict, strict=True)
     return model
 
@@ -241,12 +224,12 @@ class PreTrainer:
         optimizer = torch.optim.Adam(plist, lr=self.lr, weight_decay=self.weight_decay)
         saver = SaveBestModel(save_dir=save_dir, save_name="model.pth")
 
-        if task_type == "c":
+        if task_type in ["c", "cg", "f"]:
             tsk_loss = ce_loss
         elif task_type == "r":
             tsk_loss = mae_loss
         else:
-            raise ValueError("Invalid task_type. Use 'c', or 'r'. ")
+            raise ValueError("Invalid task_type. Use 'c', 'cg', 'f' or 'r'. ")
 
         self.ssl_loss = ssl_loss
         self.tsk_loss = tsk_loss
@@ -273,7 +256,7 @@ class PreTrainer:
         dfcx_test=None,
         dfy_test=None,
         task_name="notask",
-        task_type="c",
+        task_type="cg",
         aug_method="mix",
         scale_method="minmax",
         **augargs,
@@ -572,218 +555,6 @@ class PreTrainer:
         return deepcopy(self)
 
 
-class Adapter:
-
-    def __init__(
-        self,
-        pretrainer,
-        adp_feature="TMB",
-        lr=1e-3,
-        weight_decay=1e-6,
-        batch_size=128,
-        epochs=100,
-        patience=10,
-        save_dir="./",
-        verbose=True,
-        with_wandb=False,
-        save_best_model=False,
-    ):
-        self.lr = lr
-        self.weight_decay = weight_decay
-        self.epochs = epochs
-        self.patience = patience
-        self.pretrainer = pretrainer.copy()
-        self.adp_feature = adp_feature
-        self.batch_size = batch_size
-        self.save_dir = save_dir
-        self.with_wandb = with_wandb
-
-        self._init_adaptive_model(Key=self.adp_feature)
-        self.verbose = verbose
-        self.save_best_model = save_best_model
-        self.scaler = pretrainer.scaler
-        self.device = pretrainer.device
-
-    def _init_adaptive_model(self, Key="TMB"):
-
-        fixseed(self.pretrainer.seed)  # Resets the random seed
-        model_args = deepcopy(self.pretrainer.saver.inMemorySave["model_args"])
-        model_weights = deepcopy(self.pretrainer.saver.inMemorySave["model_state_dict"])
-
-        ### define finetune model
-        model = Compass(**model_args)
-
-        encoder_state = OrderedDict()
-        for k, v in model_weights.items():
-            encoder_state[k] = v
-
-        ### load Pretrained model
-        model.load_state_dict(encoder_state, strict=False)
-        model = model.to(self.pretrainer.device)
-
-        ctp_idx = (
-            model.latentprojector.cellpathwayprojector.CELLPATHWAY.index.tolist().index(
-                Key
-            )
-        )
-        proj_idx = model.latentprojector.cellpathway_proj_cols.index(Key)
-
-        ctp_name = "cellpathway_%s" % ctp_idx
-
-        gs_idx_list = model.latentprojector.cellpathwayprojector.CELLPATHWAY.loc[Key]
-        gs_name_list = ["geneset_%s" % idx for idx in gs_idx_list]
-
-        for key, param in model.latentprojector.cellpathwayprojector.named_parameters():
-            key_idx = key.split(".")[-1]
-            if key_idx == ctp_name:
-                print(key)
-                param.requires_grad = True
-            else:
-                param.requires_grad = False
-
-        for key, param in model.latentprojector.genesetprojector.named_parameters():
-            key_idx = key.split(".")[-1]
-            if key_idx in gs_name_list:
-                print(key)
-                param.requires_grad = True
-            else:
-                param.requires_grad = False
-
-        for param in model.inputencoder.parameters():
-            param.requires_grad = False
-
-        for param in model.latentprojector.patientprojector.parameters():
-            param.requires_grad = False
-
-        for param in model.latentprojector.cancerprojector.parameters():
-            param.requires_grad = False
-
-        for param in model.taskdecoder.parameters():
-            param.requires_grad = False
-
-        plist = []
-        for param in model.parameters():
-            if param.requires_grad:
-                plist.append({"params": param})
-
-        optimizer = torch.optim.Adam(plist, lr=self.lr, weight_decay=self.weight_decay)
-        loss = MAEWithNaNLabelsLoss()
-        saver = SaveBestModel(save_dir=self.save_dir, save_name="adp_model.pth")
-
-        self.model = model
-        self.proj_idx = proj_idx
-        self.optimizer = optimizer
-        self.loss = loss
-        self.saver = saver
-        plist.append({"params": param})
-
-    def adapt(self, dfcx_train, dfy_train, dfcx_test=None, dfy_test=None):
-
-        dfcx_train = self.scaler.transform(dfcx_train)
-
-        augmentor = RandomMaskAugmentor(no_augment_prob=1)  # no aug
-
-        train_itrp = TCGAData(dfcx_train, dfy_train, augmentor, K=1)
-        train_loader = data.DataLoader(
-            train_itrp,
-            batch_size=self.batch_size,
-            shuffle=True,
-            drop_last=False,
-            worker_init_fn=worker_init_fn,
-            pin_memory=True,
-            num_workers=4,
-        )  #
-
-        if dfcx_test is not None:
-            dfcx_test = self.scaler.transform(dfcx_test)
-            test_itrp = TCGAData(dfcx_test, dfy_test, augmentor, K=1)
-            test_loader = data.DataLoader(
-                test_itrp,
-                batch_size=self.batch_size,
-                shuffle=False,
-                worker_init_fn=worker_init_fn,
-                pin_memory=True,
-                num_workers=4,
-            )
-        else:
-            test_loader = None
-
-        ### training ###
-        performance = []
-        best_val_loss = float("inf")
-        patience_counter = 0
-        for epoch in tqdm(range(self.epochs), ascii=True):
-
-            train_total_loss = Adp_Trainer(
-                train_loader,
-                self.model,
-                self.optimizer,
-                self.loss,
-                self.device,
-                self.proj_idx,
-            )
-
-            saving_criteria = train_total_loss
-
-            if test_loader is not None:
-                test_total_loss = Adp_Tester(
-                    test_loader,
-                    self.model,
-                    self.optimizer,
-                    self.loss,
-                    self.device,
-                    self.proj_idx,
-                )
-
-                saving_criteria = test_total_loss
-
-            else:
-                test_total_loss = np.nan
-
-            ## saving_criteria: lower is better
-            ## saving model & Early Stopping based on saving_criteria
-            self.saver(saving_criteria, epoch, self.model, self.optimizer, self.scaler)
-            if saving_criteria < best_val_loss:
-                best_val_loss = saving_criteria
-                patience_counter = 0
-            else:
-                patience_counter += 1
-
-            performance.append([epoch, train_total_loss, test_total_loss])
-
-            if self.with_wandb:
-                self.wandb.log(
-                    {"train_loss": train_total_loss, "test_loss": test_total_loss}
-                )
-
-            if self.verbose:
-                print(
-                    "Epoch: {}/{} - Train Loss: {:.4f} - Test Loss: {:.4f}".format(
-                        epoch + 1, self.epochs, train_total_loss, test_total_loss
-                    )
-                )
-
-            if patience_counter >= self.patience:
-                print(
-                    f"Stopping early at epoch {epoch+1}. No improvement in validation loss for {self.patience} consecutive epochs."
-                )
-                break
-
-        if self.save_best_model:
-            self.saver.save()
-        else:
-            os.system('rm -r "%s"' % self.save_dir)
-
-        self.performance = performance
-        self.best_epoch = self.saver.inMemorySave["epoch"]
-
-        self.pretrainer.saver = self.saver
-        self.pretrainer.model = self.model
-
-        return self.pretrainer
-
-    def count_parameters(self):
-        return sum(p.numel() for p in self.model.parameters() if p.requires_grad)
 
 
 class FineTuner:

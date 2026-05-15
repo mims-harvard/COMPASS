@@ -21,7 +21,7 @@ def fixseed(seed=42):
     torch.backends.cudnn.benchmark = False
 
 
-class ClassDecoderOrg(nn.Module):
+class ClassDecoder(nn.Module):
     def __init__(
         self,
         input_dim=32,
@@ -85,7 +85,7 @@ class ClassDecoderOrg(nn.Module):
 
 
 
-class ClassDecoder(nn.Module):
+class ClassDecoderGR(nn.Module):
     def __init__(self, input_dim=44, dense_layers=[], out_dim=2,
                  dropout_p=0.0, batch_norms=True, seed=42):
         super().__init__()

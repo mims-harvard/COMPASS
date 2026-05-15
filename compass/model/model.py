@@ -8,7 +8,7 @@ Created on Fri Nov  3 13:31:25 2023
 import torch
 import torch.nn as nn
 from ..encoder import TransformerEncoder, MLPEncoder
-from ..decoder import ClassDecoder, ClassDecoderOrg, RegDecoder, ProtoNetDecoder
+from ..decoder import ClassDecoder, ClassDecoderGR, RegDecoder, ProtoNetDecoder
 from ..projector import DisentangledProjector, EntangledProjector
 
 
@@ -56,7 +56,7 @@ class Compass(nn.Module):
         """
         input_dim:  number of tokens
         task_dim: supervised learning task dim
-        task_type: {'r', 'c'}
+        task_type: {'r', 'c', 'cg', 'f'}
         num_cancer_types: int, number cancer types, default 33.
         embed_dim: latent vector dim
         encoder: {'transfomer', 'flowformer', ...}
@@ -181,10 +181,8 @@ class Compass(nn.Module):
                 batch_norms=task_batch_norms,
                 seed=self.seed,
             )
-
-        ## classification task
-        elif task_type == "co":
-            self.taskdecoder = ClassDecoderOrg(
+        elif task_type == "cg":
+            self.taskdecoder = ClassDecoderGR(
                 input_dim=self.embed_dim,
                 dense_layers=task_dense_layer,
                 out_dim=task_dim,
@@ -203,7 +201,7 @@ class Compass(nn.Module):
             )
 
         else:
-            raise ValueError("Invalid task_type. Use 'c', 'co', 'f' or 'r'. ")
+            raise ValueError("Invalid task_type. Use 'c', 'cg', 'f' or 'r'. ")
     
     def forward(self, x):
 
