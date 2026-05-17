@@ -58,6 +58,14 @@ If you prefer to regenerate the datasets from raw sources, please refer to:
 ## 🧠 Step 2: Install COMPASS
 
 ```bash
+#torch 2.x
+conda create -n compass python=3.12
+conda activate compass
+pip install immuno-compass -U
+```
+
+```bash
+#torch 1.x
 conda create -n compass python=3.8
 conda activate compass
 pip install immuno-compass==2.0.5
