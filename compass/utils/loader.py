@@ -37,7 +37,7 @@ def loadcompass(file, **kwargs):
         file = temp_file_path
 
     # Load the model
-    model = torch.load(file, **kwargs)
+    model = torch.load(file, weights_only=False, **kwargs)
 
     # Clean up wandb settings if present
     if hasattr(model, "with_wandb") and model.with_wandb:

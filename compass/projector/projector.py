@@ -118,8 +118,8 @@ class DisentangledProjector(nn.Module):
         # Move 'Reference' to the end
         noref = CELLPATHWAY[CELLPATHWAY.index != "Reference"]
         ref = CELLPATHWAY[CELLPATHWAY.index == "Reference"]
-        CELLPATHWAY = noref._append(ref)
-
+        CELLPATHWAY = pd.concat([noref, ref])
+        
         self.GENESET = GENESET
         self.CELLPATHWAY = CELLPATHWAY
 

@@ -7,7 +7,10 @@ import numpy as np
 
 
 def score(y_true, y_prob, y_pred):
-
+    y_true = y_true.astype(int)
+    y_prob = y_prob.astype(float)
+    y_pred = y_pred.astype(int)
+    
     select = ~y_true.isna()
     y_prob = y_prob[select]
     y_true = y_true[select]
@@ -28,12 +31,16 @@ def score(y_true, y_prob, y_pred):
 
 
 def score2(y_true, y_prob, y_pred):
-
+   
+    y_true = y_true.astype(int)
+    y_prob = y_prob.astype(float)
+    y_pred = y_pred.astype(int)
+    
     select = ~y_true.isna()
     y_prob = y_prob[select]
     y_true = y_true[select]
     y_pred = y_pred[select]  # .map({'NR':0, 'R':1})
-
+    
     if len(y_true.unique()) == 1:
         roc = np.nan
         prc = np.nan
@@ -62,6 +69,11 @@ def score3(y_true, y_prob, y_pred):
     tuple: roc, prc, f1, acc, mcc, fpr, fnr
     """
     # Filter non-NA values
+
+    y_true = y_true.astype(int)
+    y_prob = y_prob.astype(float)
+    y_pred = y_pred.astype(int)
+    
     select = ~y_true.isna()
     y_prob = y_prob[select]
     y_true = y_true[select]
