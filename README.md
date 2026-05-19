@@ -176,7 +176,7 @@ We welcome contributions from the community. If you have developed a COMPASS mod
 
 If you use our resources, please cite our work as follows:
 
-Wanxiang Shen, Thinh H. Nguyen, Michelle M. Li, Yepeng Huang, Intae Moon, Nitya Nair, Daniel Marbach‡, and Marinka Zitnik‡. *Generalizable AI predicts immunotherapy outcomes across cancers and treatments* [J]. [medRxiv](https://www.medrxiv.org/content/10.1101/2025.05.01.25326820).
+Wanxiang Shen, Intae Moon, Thinh H. Nguyen, Michelle M. Li, Yepeng Huang, Nitya Nair, Daniel Marbach‡, and Marinka Zitnik‡. *Generalizable AI predicts immunotherapy outcomes across cancers and treatments* [J]. [medRxiv](https://www.medrxiv.org/content/10.1101/2025.05.01.25326820).
 
 ---
 
